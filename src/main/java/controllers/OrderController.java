@@ -153,6 +153,10 @@ public class OrderController {
             + order.getUpdatedAt()
             + ")");
 
+    if(orderID == 0){
+      return null;
+    }
+
     if (orderID != 0) {
       //Update the productid of the product before returning
       order.setId(orderID);
