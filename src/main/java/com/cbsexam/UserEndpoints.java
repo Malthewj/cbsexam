@@ -35,9 +35,19 @@ public class UserEndpoints {
     //Add encryption to json rawString object(ref. utils Encryption)
     json = Encryption.encryptDecryptXOR(json);
 
+    /*
+    if(json.equals(null)){
+
+      return Response.status(400);
+
+    }*/
+
     // Return the user with the status code 200
     // TODO: What should happen if something breaks down?
     return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+
+
+
   }
 
   /** @return Responses */

@@ -3,6 +3,9 @@ package utils;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Random;
+
 import org.bouncycastle.util.encoders.Hex;
 
 public final class Hashing {
@@ -57,5 +60,14 @@ public final class Hashing {
     }
 
     return rawString;
+  }
+
+  public static byte[] getSalt() {
+
+    Random RANDOM = new SecureRandom();
+
+    byte[] salt = new byte[16];
+    RANDOM.nextBytes(salt);
+    return salt;
   }
 }

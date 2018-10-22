@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 
 public final class Config {
 
@@ -21,6 +22,7 @@ public final class Config {
   private static String SOLR_CORE;
   private static long PRODUCT_TTL;
   private static long ORDER_ID;
+  private static char[] key = {'X', 'O', 'R', 'K', 'E', 'Y'};
 
   public static long getProductTtl() {
     return PRODUCT_TTL;
@@ -68,7 +70,9 @@ public final class Config {
     return SOLR_CORE;
   }
 
-  public static void initializeConfig() throws IOException {
+  public static char[] getKey() { return key; }
+
+    public static void initializeConfig() throws IOException {
 
     // Init variables to parse JSON
     JsonObject json;
@@ -103,5 +107,6 @@ public final class Config {
     SOLR_CORE = json.get("SOLR_CORE").toString().replace("\"", "");
     PRODUCT_TTL = json.get("PRODUCT_TTL").getAsLong();
     ORDER_ID = json.get("ORDER_ID").getAsLong();
+
   }
 }
