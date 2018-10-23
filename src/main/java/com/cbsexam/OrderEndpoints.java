@@ -32,7 +32,7 @@ public class OrderEndpoints {
     String json = new Gson().toJson(order);
 
     //Add encryption to json rawString object(ref. utils Encryption)
-    json= Encryption.encryptDecryptXOR(json);
+    json = Encryption.encryptDecryptXOR(json);
 
     // Return a response with status 200 and JSON as type
     return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
