@@ -34,6 +34,8 @@ public class ProductEndpoints {
     //Add encryption to json rawString object(ref. utils Encryption)
     json = Encryption.encryptDecryptXOR(json);
 
+//    new Gson().toJson(json);
+
     // Return a response with status 200 and JSON as type
     return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
   }
