@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public final class Config {
 
@@ -22,7 +22,13 @@ public final class Config {
   private static String SOLR_CORE;
   private static long PRODUCT_TTL;
   private static long ORDER_ID;
-  private static char[] key = {'X', 'O', 'R', 'K', 'E', 'Y'};
+  private static char key1;
+  private static char key2;
+  private static char key3;
+  private static char key4;
+  private static char key5;
+  private static char key6;
+  private static char[] keyArray;
 
   public static long getProductTtl() {
     return PRODUCT_TTL;
@@ -70,9 +76,9 @@ public final class Config {
     return SOLR_CORE;
   }
 
-  public static char[] getKey() { return key; }
+  public static char[] getKeyArray() { return keyArray; }
 
-    public static void initializeConfig() throws IOException {
+  public static void initializeConfig() throws IOException {
 
     // Init variables to parse JSON
     JsonObject json;
@@ -106,6 +112,16 @@ public final class Config {
     SOLR_PATH = json.get("SOLR_PATH").toString().replace("\"", "");
     SOLR_CORE = json.get("SOLR_CORE").toString().replace("\"", "");
     PRODUCT_TTL = json.get("PRODUCT_TTL").getAsLong();
+    key1 = json.get("Key1").getAsCharacter();
+    key2 = json.get("Key2").getAsCharacter();
+    key3 = json.get("Key3").getAsCharacter();
+    key4 = json.get("Key4").getAsCharacter();
+    key5 = json.get("Key5").getAsCharacter();
+    key6 = json.get("Key6").getAsCharacter();
+
+    keyArray = new char[]{key1, key2, key3, key4, key5, key6};
 
   }
+
+
 }
