@@ -3,6 +3,8 @@ package controllers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import com.cbsexam.UserEndpoints;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -111,6 +113,7 @@ public class UserController {
 
     // Insert the user in the DB
     // TODO: Hash the user password before saving it : fix
+    hashing.setSalt(String.valueOf(user.getCreatedTime()));
 
     int userID = dbCon.insert(
         "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
@@ -124,6 +127,8 @@ public class UserController {
             + "', "
             + user.getCreatedTime()
             + ")");
+
+
 
     if (userID != 0) {
       //Update the userid of the user before returning
@@ -145,6 +150,22 @@ public class UserController {
     }
 
     dbCon.delete("DELETE FROM user WHERE id = " + id);
+
+  }
+
+  public static void updateUser(int userUpdatingID, User userUpdates) {
+    Log.writeLog(UserController.class.getName(), userUpdates, "Actually updating a user in DB", 0);
+
+    if(dbCon == null){
+      dbCon = new DatabaseController();
+    }
+
+      dbCon.update("UPDATE user SET first_name = '" + userUpdates.getFirstname() + "'" +
+              ", last_name = '" + userUpdates.getLastname() + "'" +
+              ", email = '" + userUpdates.getEmail() + "'" +
+              " WHERE id = " + userUpdatingID);
+
+//    System.out.println(userUpdatingID);
 
   }
 }

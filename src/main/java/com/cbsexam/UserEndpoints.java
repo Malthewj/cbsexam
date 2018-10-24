@@ -116,11 +116,29 @@ public class UserEndpoints {
     return Response.status(200).entity("User with id " + id + " is now deleted").build();
   }
 
-  // TODO: Make the system able to update users
-  public Response updateUser(String x) {
+  // TODO: Make the system able to update users : fix, not yet able to only change ONE attribute
+  @POST
+  @Path("/update/{idUser}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response updateUser(@PathParam("idUser") int userToUpdateID, String userToUpdate) {
+
+    User userUpdates = new Gson().fromJson(userToUpdate, User.class);
+
+    if(userUpdates.getEmail().equals("") || userUpdates.getLastname().equals("") || userUpdates.getFirstname().isEmpty()) {
+      return Response.status(400).entity("ERROR - check input takes firstname, lastname and email").build();
+    }
+    else if(userToUpdateID != 0){
+      UserController.updateUser(userToUpdateID, userUpdates);
+    }
 
     // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+
+    return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(
+            "User with ID " + userToUpdateID + " is now updated to:\n" +
+                    "Firstname: " + userUpdates.getFirstname() + "\n" +
+            "Lastname: " + userUpdates.getLastname() + "\n" +
+            "Email: " + userUpdates.getEmail()).build();
+
   }
 
 }

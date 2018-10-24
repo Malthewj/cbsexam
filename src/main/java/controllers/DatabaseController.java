@@ -127,4 +127,21 @@ public class DatabaseController {
     }
 
   }
+
+  public void update(String sql) {
+
+    if (connection == null){
+      connection = getConnection();
+    }
+
+    try{
+      PreparedStatement updateStatement = connection.prepareStatement(sql);
+
+      updateStatement.executeUpdate();
+
+    }catch (SQLException e){
+      System.out.println(e.getMessage());
+    }
+
+  }
 }

@@ -10,7 +10,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 public final class Hashing {
 
-  private String salt = Config.getSalt();
+  private String salt;
 
   private String hashMD5(String str) {
     return Hashing.md5(str);
@@ -20,12 +20,14 @@ public final class Hashing {
 
   /**
    * Hash string AND salt with MD5 hash
-   * @param str input string
+   * @param password input string
    * @return MD5 hashed of string
    */
-  public String hashWithSaltMD5(String str){
+  public String hashWithSaltMD5(String password){
 
-    String salting = str + this.salt;
+    String salting = password + this.salt;
+
+    System.out.println(salting);
 
     return hashMD5(salting);
   }
@@ -88,5 +90,5 @@ public final class Hashing {
     return rawString;
   }
 
-
+  public void setSalt(String salt) { this.salt = salt; }
 }
