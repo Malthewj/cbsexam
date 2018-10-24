@@ -29,6 +29,7 @@ public final class Config {
   private static char key5;
   private static char key6;
   private static char[] keyArray;
+  private static String salt;
 
   public static long getProductTtl() {
     return PRODUCT_TTL;
@@ -78,6 +79,8 @@ public final class Config {
 
   public static char[] getKeyArray() { return keyArray; }
 
+  public static String getSalt() { return salt; }
+
   public static void initializeConfig() throws IOException {
 
     // Init variables to parse JSON
@@ -120,6 +123,8 @@ public final class Config {
     key6 = json.get("Key6").getAsCharacter();
 
     keyArray = new char[]{key1, key2, key3, key4, key5, key6};
+
+    salt = json.get("SaltKey").getAsString();
 
   }
 

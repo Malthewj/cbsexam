@@ -10,7 +10,33 @@ import org.bouncycastle.util.encoders.Hex;
 
 public final class Hashing {
 
-  // TODO: You should add a salt and make this secure
+  private String salt = Config.getSalt();
+
+  private String hashMD5(String str) {
+    return Hashing.md5(str);
+  }
+
+  private String hashSHA(String str){ return Hashing.sha(str); }
+
+  /**
+   * Hash string AND salt with MD5 hash
+   * @param str input string
+   * @return MD5 hashed of string
+   */
+  public String hashWithSaltMD5(String str){
+
+    String salting = str + this.salt;
+
+    return hashMD5(salting);
+  }
+
+  public String hashWithSaltSHA(String str){
+    String salting = str + this.salt;
+
+    return  hashSHA(salting);
+  }
+
+  // TODO: You should add a salt and make this secure : fix
   public static String md5(String rawString) {
     try {
 
@@ -40,7 +66,7 @@ public final class Hashing {
     return null;
   }
 
-  // TODO: You should add a salt and make this secure
+  // TODO: You should add a salt and make this secure : fix
   public static String sha(String rawString) {
     try {
       // We load the hashing algoritm we wish to use.
@@ -62,12 +88,5 @@ public final class Hashing {
     return rawString;
   }
 
-  public static byte[] getSalt() {
 
-    Random RANDOM = new SecureRandom();
-
-    byte[] salt = new byte[16];
-    RANDOM.nextBytes(salt);
-    return salt;
-  }
 }

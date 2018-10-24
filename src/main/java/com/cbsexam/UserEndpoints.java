@@ -64,6 +64,9 @@ public class UserEndpoints {
     //Add encryption to json rawString object(ref. utils Encryption)
     json = Encryption.encryptDecryptXOR(json);
 
+    //Remove comment notations to decrypt
+    json = Encryption.encryptDecryptXOR(json);
+
     // Return the users with the status code 200
     return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
   }
