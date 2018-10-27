@@ -8,6 +8,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import model.User;
 import utils.Encryption;
+import utils.Hashing;
 import utils.Log;
 
 @Path("user")
@@ -38,8 +39,16 @@ public class UserEndpoints {
 
     }*/
 
+    // TODO: What should happen if something breaks down? : fix
+    ArrayList<User> userCheck = new ArrayList<>();
+    userCheck = UserController.getUsers();
+
+
+    if(idUser == 0 || userCheck.size() < idUser){
+      return Response.status(400).entity("Inputtet user ID is not valid. 0 in not valid").build();
+    }
+
     // Return the user with the status code 200
-    // TODO: What should happen if something breaks down?
     return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
 
 
@@ -94,14 +103,39 @@ public class UserEndpoints {
     }
   }
 
+  // TODO: Make a smart way of login in without having to enter ID, maybe not possible
   // TODO: Make the system able to login users and assign them a token to use throughout the system.
   @POST
-  @Path("/login")
+  @Path("/login/{idUser}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response loginUser(String x) {
+  public Response loginUser(@PathParam("idUser") int idUser, String login) {
 
+    User userLogin = new Gson().fromJson(login, User.class);
+
+    ArrayList<User> users;
+
+    //All users are getted in an arraylist
+    users = UserController.getUsers();
+
+    for (User user : users) {
+      if (user.getFirstname().equals(userLogin.getFirstname()) && idUser == user.getId()) {
+        //Inputted "user"'s created time is set to found user.
+        userLogin.setCreatedTime(user.getCreatedTime());
+        Hashing hashing = new Hashing();
+
+        //Created time is set to be the salt
+        hashing.setSalt(String.valueOf(userLogin.getCreatedTime()));
+
+        //The password string is hashed with a salt
+        String password = hashing.hashWithSaltMD5(userLogin.getPassword());
+
+        if(user.getPassword().equals(password)){
+          return Response.status(200).entity("You are logged in!").build();
+        }
+      }
+    }
     // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    return Response.status(400).entity("Not valid login attempt. Please match your input").build();
   }
 
   // TODO: Make the system able to delete users : fix
@@ -116,7 +150,7 @@ public class UserEndpoints {
     return Response.status(200).entity("User with id " + id + " is now deleted").build();
   }
 
-  // TODO: Make the system able to update users : fix, not yet able to only change ONE attribute
+  // TODO: Make the system able to update users : fix
   @POST
   @Path("/update/{idUser}")
   @Consumes(MediaType.APPLICATION_JSON)
