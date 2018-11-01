@@ -178,10 +178,13 @@ public class UserController {
       dbCon = new DatabaseController();
     }
 
-      dbCon.deleteUpdate("UPDATE user SET first_name = '" + userUpdates.getFirstname() + "'" +
-              ", last_name = '" + userUpdates.getLastname() + "'" +
-              ", email = '" + userUpdates.getEmail() + "'" +
-              " WHERE id = " + userUpdatingID);
+    //Creating the SQL statement
+    String sql = "UPDATE user SET first_name = '" + userUpdates.getFirstname() + "'" +
+            ", last_name = '" + userUpdates.getLastname() + "'" +
+            ", email = '" + userUpdates.getEmail() + "'" +
+            " WHERE id = " + userUpdatingID;
+
+    dbCon.deleteUpdate(sql);
 
 //    System.out.println(userUpdatingID);
 

@@ -25,9 +25,11 @@ public class ProductCache {
     // If we whis to clear cache, we can set force update.
     // Otherwise we look at the age of the cache and figure out if we should update.
     // If the list is empty we also check for new products
+
+      //Changed to created + ttl should be less than currenttime
     if (forceUpdate
-        || ((this.created + this.ttl) >= (System.currentTimeMillis() / 1000L))
-        || this.products.isEmpty()) {
+        || ((this.created + this.ttl) <= (System.currentTimeMillis() / 1000L))
+        || this.products == null) {
 
       // Get products from controller, since we wish to update.
       ArrayList<Product> products = ProductController.getProducts();

@@ -40,7 +40,8 @@ public class ProductController {
                 rs.getString("sku"),
                 rs.getFloat("price"),
                 rs.getString("description"),
-                rs.getInt("stock"));
+                rs.getInt("stock"),
+                    rs.getLong("created_at"));
 
         // Return the product
         return product;
@@ -75,7 +76,8 @@ public class ProductController {
                 rs.getString("sku"),
                 rs.getFloat("price"),
                 rs.getString("description"),
-                rs.getInt("stock"));
+                rs.getInt("stock"),
+                    rs.getLong("created_at"));
 
         return product;
       } else {
@@ -99,7 +101,7 @@ public class ProductController {
       dbCon = new DatabaseController();
     }
 
-    // TODO: Use caching layer.
+    // TODO: Use caching layer : fix
     ProductCache productCache = new ProductCache();
 
     String sql = "SELECT * FROM product";
@@ -119,7 +121,8 @@ public class ProductController {
                 rs.getString("sku"),
                 rs.getFloat("price"),
                 rs.getString("description"),
-                rs.getInt("stock"));
+                rs.getInt("stock"),
+                    rs.getLong("created_at"));
 
         products.add(product);
       }
