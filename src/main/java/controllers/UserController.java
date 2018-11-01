@@ -162,6 +162,18 @@ public class UserController {
   public static void updateUser(int userUpdatingID, User userUpdates) {
     Log.writeLog(UserController.class.getName(), userUpdates, "Actually updating a user in DB", 0);
 
+      User currentUser = getUser(userUpdatingID);
+
+      if(userUpdates.getEmail()==null){
+          userUpdates.setEmail(currentUser.getEmail());
+      }
+      if(userUpdates.getLastname()==null){
+          userUpdates.setLastname(currentUser.getLastname());
+      }
+      if(userUpdates.getFirstname()==null){
+          userUpdates.setFirstname(currentUser.getFirstname());
+      }
+
     if(dbCon == null){
       dbCon = new DatabaseController();
     }

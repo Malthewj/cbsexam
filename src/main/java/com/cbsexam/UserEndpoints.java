@@ -148,24 +148,24 @@ public class UserEndpoints {
   @POST
   @Path("/update/{idUser}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response updateUser(@PathParam("idUser") int userToUpdateID, String userToUpdate) {
+  public Response updateUser(@PathParam("idUser") int userToUpdateID, String updatedUserData) {
 
-    User userUpdates = new Gson().fromJson(userToUpdate, User.class);
+    User updatedUserDataObj = new Gson().fromJson(updatedUserData, User.class);
 
-    if(userUpdates.getEmail().equals("") || userUpdates.getLastname().equals("") || userUpdates.getFirstname().isEmpty()) {
-      return Response.status(400).entity("ERROR - check input takes firstname, lastname and email").build();
+    if(updatedUserDataObj.getEmail().equals("") && updatedUserDataObj.getLastname().equals("") && updatedUserDataObj.getFirstname().isEmpty()) {
+        return Response.status(400).entity("ERROR - check input takes firstname, lastname or email").build();
     }
     else if(userToUpdateID != 0){
-      UserController.updateUser(userToUpdateID, userUpdates);
+        UserController.updateUser(userToUpdateID, updatedUserDataObj);
     }
 
     // Return a response with status 200 and JSON as type
 
     return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(
             "User with ID " + userToUpdateID + " is now updated to:\n" +
-                    "Firstname: " + userUpdates.getFirstname() + "\n" +
-            "Lastname: " + userUpdates.getLastname() + "\n" +
-            "Email: " + userUpdates.getEmail()).build();
+                    "Firstname: " + updatedUserDataObj.getFirstname() + "\n" +
+            "Lastname: " + updatedUserDataObj.getLastname() + "\n" +
+            "Email: " + updatedUserDataObj.getEmail()).build();
 
   }
 
