@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.cbsexam.UserEndpoints;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -41,7 +40,8 @@ public class UserController {
                 rs.getString("last_name"),
                 rs.getString("password"),
                 rs.getString("email"),
-                rs.getLong("created_at"));
+                rs.getLong("created_at"),
+                    rs.getString("username"));
 
         // return the create object
         return user;
@@ -86,7 +86,9 @@ public class UserController {
                 rs.getString("last_name"),
                 rs.getString("password"),
                 rs.getString("email"),
-                rs.getLong("created_at"));
+                rs.getLong("created_at"),
+                    rs.getString("username"));
+
 
         // Add element to list
         users.add(user);
@@ -119,7 +121,7 @@ public class UserController {
     hashing.setSalt(String.valueOf(user.getCreatedTime()));
 
     int userID = dbCon.insert(
-        "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
+        "INSERT INTO user(first_name, last_name, password, email, created_at, username) VALUES('"
             + user.getFirstname()
             + "', '"
             + user.getLastname()
@@ -129,7 +131,8 @@ public class UserController {
             + user.getEmail()
             + "', "
             + user.getCreatedTime()
-            + ")");
+            + ", '"
+            + user.getUsername() + "')");
 
 
 
@@ -152,7 +155,7 @@ public class UserController {
       dbCon = new DatabaseController();
     }
 
-    dbCon.delete("DELETE FROM user WHERE id = " + id);
+    dbCon.deleteUpdate("DELETE FROM user WHERE id = " + id);
 
   }
 
@@ -163,7 +166,7 @@ public class UserController {
       dbCon = new DatabaseController();
     }
 
-      dbCon.update("UPDATE user SET first_name = '" + userUpdates.getFirstname() + "'" +
+      dbCon.deleteUpdate("UPDATE user SET first_name = '" + userUpdates.getFirstname() + "'" +
               ", last_name = '" + userUpdates.getLastname() + "'" +
               ", email = '" + userUpdates.getEmail() + "'" +
               " WHERE id = " + userUpdatingID);

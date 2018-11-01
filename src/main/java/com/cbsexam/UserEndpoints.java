@@ -32,12 +32,6 @@ public class UserEndpoints {
     //Add encryption to json rawString object(ref. utils Encryption)
     json = Encryption.encryptDecryptXOR(json);
 
-    /*
-    if(json.equals(null)){
-
-      return Response.status(400);
-
-    }*/
 
     // TODO: What should happen if something breaks down? : fix
     ArrayList<User> userCheck = new ArrayList<>();
@@ -73,7 +67,7 @@ public class UserEndpoints {
     //Add encryption to json rawString object(ref. utils Encryption)
     json = Encryption.encryptDecryptXOR(json);
 
-    //Remove comment notations to decrypt
+    //Remove comment notations to remove decrypting
     json = Encryption.encryptDecryptXOR(json);
 
     // Return the users with the status code 200
@@ -99,7 +93,7 @@ public class UserEndpoints {
       // Return a response with status 200 and JSON as type
       return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
     } else {
-      return Response.status(400).entity("Could not create user").build();
+      return Response.status(400).entity("Could not create user - username might been taken").build();
     }
   }
 
@@ -138,9 +132,9 @@ public class UserEndpoints {
     return Response.status(400).entity("Not valid login attempt. Please match your input").build();
   }
 
-  // TODO: Make the system able to delete users : fix
+  // TODO: Make the system able to deleteUpdate users : fix
   @POST
-  @Path("/delete/{idUser}")
+  @Path("/deleteUpdate/{idUser}")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response deleteUser(@PathParam("idUser") int id) {
 

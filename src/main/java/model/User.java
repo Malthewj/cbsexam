@@ -8,14 +8,16 @@ public class User {
   public String email;
   private String password;
   private long createdTime;
+  private String username;
 
-  public User(int id, String firstname, String lastname, String password, String email, long createdTime) {
+  public User(int id, String firstname, String lastname, String password, String email, long createdTime, String username) {
     this.id = id;
     this.firstname = firstname;
     this.lastname = lastname;
     this.password = password;
     this.email = email;
     this.createdTime = createdTime;
+    this.username = username;
   }
 
   public int getId() {
@@ -63,4 +65,8 @@ public class User {
   public void setCreatedTime(long createdTime) {
     this.createdTime = createdTime;
   }
+
+  public String getUsername() { return username; }
+
+  public void setUsername(String username) { this.username = username; }
 }
