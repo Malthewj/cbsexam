@@ -117,7 +117,7 @@ public class UserController {
     }
 
     // Insert the user in the DB
-    // TODO: Hash the user password before saving it : fix
+    // TODO: Hash the user password before saving it : fixed
     hashing.setSalt(String.valueOf(user.getCreatedTime()));
 
     int userID = dbCon.insert(
@@ -126,7 +126,7 @@ public class UserController {
             + "', '"
             + user.getLastname()
             + "', '"
-            + hashing.hashWithSaltMD5(user.getPassword())
+            + hashing.hashWithSaltSHA(user.getPassword())
             + "', '"
             + user.getEmail()
             + "', "

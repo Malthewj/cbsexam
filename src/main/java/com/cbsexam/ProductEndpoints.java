@@ -30,7 +30,7 @@ public class ProductEndpoints {
     // Call our controller-layer in order to get the order from the DB
     Product product = ProductController.getProduct(idProduct);
 
-    // TODO: Add Encryption to JSON : fix
+    // TODO: Add Encryption to JSON : fixed
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(product);
 
@@ -53,7 +53,7 @@ public class ProductEndpoints {
       // forceUpdate set to false since we only want to update if new products added
     ArrayList<Product> products = productCache.getProducts(false);
 
-    // TODO: Add Encryption to JSON : fix
+    // TODO: Add Encryption to JSON : fixed
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(products);
 

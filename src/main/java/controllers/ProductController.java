@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import cache.ProductCache;
+import com.cbsexam.ProductEndpoints;
 import model.Product;
 import utils.Log;
 
@@ -101,8 +102,8 @@ public class ProductController {
       dbCon = new DatabaseController();
     }
 
-    // TODO: Use caching layer : fix
-    ProductCache productCache = new ProductCache();
+    /* TODO: Use caching layer : fixed -
+    the to-do is misplayed since the caching layer should be used in ProductEndpoints*/
 
     String sql = "SELECT * FROM product";
 

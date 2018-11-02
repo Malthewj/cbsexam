@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 public final class Config {
 
@@ -20,8 +19,7 @@ public final class Config {
   private static int SOLR_PORT;
   private static String SOLR_PATH;
   private static String SOLR_CORE;
-  private static long PRODUCT_TTL;
-  private static long ORDER_ID;
+  private static long CACHE_TTL;
   private static char key1;
   private static char key2;
   private static char key3;
@@ -30,11 +28,9 @@ public final class Config {
   private static char key6;
   private static char[] keyArray;
 
-  public static long getProductTtl() {
-    return PRODUCT_TTL;
+  public static long getCacheTtl() {
+    return CACHE_TTL;
   }
-
-  public static long getOrderID() { return ORDER_ID; }
 
   public static String getDatabaseHost() {
     return DATABASE_HOST;
@@ -111,7 +107,8 @@ public final class Config {
     SOLR_PORT = Integer.parseInt(json.get("SOLR_PORT").toString().replace("\"", ""));
     SOLR_PATH = json.get("SOLR_PATH").toString().replace("\"", "");
     SOLR_CORE = json.get("SOLR_CORE").toString().replace("\"", "");
-    PRODUCT_TTL = json.get("PRODUCT_TTL").getAsLong();
+    CACHE_TTL = json.get("CACHE_TTL").getAsLong();
+
     key1 = json.get("Key1").getAsCharacter();
     key2 = json.get("Key2").getAsCharacter();
     key3 = json.get("Key3").getAsCharacter();

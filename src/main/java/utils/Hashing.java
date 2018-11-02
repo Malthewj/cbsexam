@@ -23,6 +23,8 @@ public final class Hashing {
    * @param password input string
    * @return MD5 hashed of string
    */
+
+  //MD5 SHOULD NOT be used since people found out to generate collisions
   public String hashWithSaltMD5(String password){
 
     String salting = password + this.salt;
@@ -32,13 +34,13 @@ public final class Hashing {
     return hashMD5(salting);
   }
 
-  public String hashWithSaltSHA(String str){
-    String salting = str + this.salt;
+  public String hashWithSaltSHA(String password){
+    String salting = password + this.salt;
 
     return  hashSHA(salting);
   }
 
-  // TODO: You should add a salt and make this secure : fix
+  // TODO: You should add a salt and make this secure : fixed
   public static String md5(String rawString) {
     try {
 
@@ -68,7 +70,7 @@ public final class Hashing {
     return null;
   }
 
-  // TODO: You should add a salt and make this secure : fix
+  // TODO: You should add a salt and make this secure : fixed
   public static String sha(String rawString) {
     try {
       // We load the hashing algoritm we wish to use.

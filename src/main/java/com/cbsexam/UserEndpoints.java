@@ -1,5 +1,6 @@
 package com.cbsexam;
 
+import cache.UserCache;
 import com.google.gson.Gson;
 import controllers.UserController;
 import java.util.ArrayList;
@@ -14,6 +15,9 @@ import utils.Log;
 @Path("user")
 public class UserEndpoints {
 
+
+    public static UserCache userCache = new UserCache();
+
   /**
    * @param idUser
    * @return Responses
@@ -25,7 +29,7 @@ public class UserEndpoints {
     // Use the ID to get the user from the controller.
     User user = UserController.getUser(idUser);
 
-    // TODO: Add Encryption to JSON : fix
+    // TODO: Add Encryption to JSON : fixed
     // Convert the user object to json in order to return the object
     String json = new Gson().toJson(user);
 
@@ -33,7 +37,7 @@ public class UserEndpoints {
     json = Encryption.encryptDecryptXOR(json);
 
 
-    // TODO: What should happen if something breaks down? : fix
+    // TODO: What should happen if something breaks down? : (fixed)
     ArrayList<User> userCheck = new ArrayList<>();
     userCheck = UserController.getUsers();
 
@@ -57,10 +61,10 @@ public class UserEndpoints {
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
 
-    // Get a list of users
-    ArrayList<User> users = UserController.getUsers();
+    // Get a list of users from the cache function
+    ArrayList<User> users = userCache.getUsers(false);
 
-    // TODO: Add Encryption to JSON : fix
+    // TODO: Add Encryption to JSON : fixed
     // Transfer users to json in order to return it to the user
     String json = new Gson().toJson(users);
 
@@ -84,6 +88,9 @@ public class UserEndpoints {
 
     // Use the controller to add the user
     User createUser = UserController.createUser(newUser);
+
+    //Update of the user cache, since there is a new user in the ArrayList of users
+    userCache.getUsers(true);
 
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(createUser);
@@ -121,7 +128,7 @@ public class UserEndpoints {
         hashing.setSalt(String.valueOf(userLogin.getCreatedTime()));
 
         //The password string is hashed with a salt
-        String password = hashing.hashWithSaltMD5(userLogin.getPassword());
+        String password = hashing.hashWithSaltSHA(userLogin.getPassword());
 
         if(user.getPassword().equals(password)){
           return Response.status(200).entity("You are logged in!").build();
@@ -132,7 +139,7 @@ public class UserEndpoints {
     return Response.status(400).entity("Not valid login attempt. Please match your input").build();
   }
 
-  // TODO: Make the system able to deleteUpdate users : fix
+  // TODO: Make the system able to deleteUpdate users : fixed
   @POST
   @Path("/deleteUpdate/{idUser}")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -140,11 +147,14 @@ public class UserEndpoints {
 
     UserController.deleteUser(id);
 
+      //Update of the user cache, since there is deleted a User in the ArrayList of users
+      userCache.getUsers(true);
+
     // Return a response with status 200 and JSON as type
     return Response.status(200).entity("User with id " + id + " is now deleted").build();
   }
 
-  // TODO: Make the system able to update users : fix
+  // TODO: Make the system able to update users : fixed
   @POST
   @Path("/update/{idUser}")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -157,6 +167,9 @@ public class UserEndpoints {
     }
     else if(userToUpdateID != 0){
         UserController.updateUser(userToUpdateID, updatedUserDataObj);
+
+        //Update of the user cache, since there is new information in the ArrayList of users
+        userCache.getUsers(true);
     }
 
     // Return a response with status 200 and JSON as type
