@@ -32,10 +32,10 @@ public class ProductCache {
         || this.products == null) {
 
       // Get products from controller, since we wish to update.
-      ArrayList<Product> actualProducts = ProductController.getProducts();
+      ArrayList<Product> cacheArrayList = ProductController.getProducts();
 
       // Set products for the instance and set created timestamp
-      this.products = actualProducts;
+      this.products = cacheArrayList;
       this.created = System.currentTimeMillis() / 1000L;
     }
 

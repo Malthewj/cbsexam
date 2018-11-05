@@ -81,7 +81,7 @@ public class DatabaseController {
     return rs;
   }
 
-  public int insert(String sql) {
+  public int insert(String sql){
 
     // Set key to 0 as a start
     int result = 0;
@@ -91,6 +91,7 @@ public class DatabaseController {
       connection = getConnection();
 
     try {
+        //connection.setAutoCommit(false);
       // Build the statement up in a safe way
       PreparedStatement statement =
           connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -103,6 +104,8 @@ public class DatabaseController {
       if (generatedKeys.next()) {
         return generatedKeys.getInt(1);
       }
+
+      //connection.commit();
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }

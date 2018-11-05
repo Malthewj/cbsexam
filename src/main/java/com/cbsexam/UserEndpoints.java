@@ -89,13 +89,13 @@ public class UserEndpoints {
     // Use the controller to add the user
     User createUser = UserController.createUser(newUser);
 
-    //Update of the user cache, since there is a new user in the ArrayList of users
+    //Force update of the user cache, since there is a new user in the ArrayList of users
     userCache.getUsers(true);
 
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(createUser);
 
-    // Return the data to the user
+    // Checks if the username is already taken
     if (createUser != null) {
       // Return a response with status 200 and JSON as type
       return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
@@ -104,22 +104,21 @@ public class UserEndpoints {
     }
   }
 
-  // TODO: Make a smart way of login in without having to enter ID, maybe not possible
+  // TODO: Make a smart way of login in without having to enter ID, maybe not possible : fixed (implemented username)
   // TODO: Make the system able to login users and assign them a token to use throughout the system.
   @POST
-  @Path("/login/{idUser}")
+  @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response loginUser(@PathParam("idUser") int idUser, String login) {
+  public Response loginUser(String login) {
 
     User userLogin = new Gson().fromJson(login, User.class);
 
-    ArrayList<User> users;
-
     //All users are getted in an arraylist
-    users = UserController.getUsers();
+      ArrayList<User> users = UserController.getUsers();
 
     for (User user : users) {
-      if (user.getFirstname().equals(userLogin.getFirstname()) && idUser == user.getId()) {
+      if (user.getUsername().equals(userLogin.getUsername())) {
+
         //Inputted "user"'s created time is set to found user.
         userLogin.setCreatedTime(user.getCreatedTime());
         Hashing hashing = new Hashing();
@@ -133,15 +132,16 @@ public class UserEndpoints {
         if(user.getPassword().equals(password)){
           return Response.status(200).entity("You are logged in!").build();
         }
+
       }
     }
     // Return a response with status 200 and JSON as type
     return Response.status(400).entity("Not valid login attempt. Please match your input").build();
   }
 
-  // TODO: Make the system able to deleteUpdate users : fixed
+  // TODO: Make the system able to delete users : fixed
   @POST
-  @Path("/deleteUpdate/{idUser}")
+  @Path("/delete/{idUser}")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response deleteUser(@PathParam("idUser") int id) {
 
@@ -179,7 +179,6 @@ public class UserEndpoints {
                     "Firstname: " + updatedUserDataObj.getFirstname() + "\n" +
             "Lastname: " + updatedUserDataObj.getLastname() + "\n" +
             "Email: " + updatedUserDataObj.getEmail()).build();
-
   }
 
 }
