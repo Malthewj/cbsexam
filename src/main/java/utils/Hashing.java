@@ -29,8 +29,6 @@ public final class Hashing {
 
     String salting = password + this.salt;
 
-    System.out.println(salting);
-
     return hashMD5(salting);
   }
 

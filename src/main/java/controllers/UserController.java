@@ -8,6 +8,8 @@ import model.User;
 import utils.Hashing;
 import utils.Log;
 
+import javax.ws.rs.core.Response;
+
 public class UserController {
 
   private static DatabaseController dbCon;
@@ -47,6 +49,7 @@ public class UserController {
         // return the create object
         return user;
       } else {
+
         System.out.println("No user found");
       }
     } catch (SQLException ex) {
