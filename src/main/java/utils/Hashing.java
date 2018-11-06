@@ -24,7 +24,7 @@ public final class Hashing {
    * @return MD5 hashed of string
    */
 
-  //MD5 SHOULD NOT be used since people found out to generate collisions
+  //Malthe: MD5 SHOULD NOT be used since people found out to generate collisions
   public String hashWithSaltMD5(String password){
 
     String salting = password + this.salt;
@@ -93,4 +93,6 @@ public final class Hashing {
   }
 
   public void setSalt(String salt) { this.salt = salt; }
+
+  public String getSalt() { return salt; }
 }

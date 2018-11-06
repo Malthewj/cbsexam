@@ -76,6 +76,7 @@ public class OrderController {
       dbCon = new DatabaseController();
     }
 
+    //Malthe: changed to orders instead of order
     String sql = "SELECT * FROM orders";
 
     ResultSet rs = dbCon.query(sql);

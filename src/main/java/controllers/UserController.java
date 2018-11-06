@@ -30,6 +30,7 @@ public class UserController {
     ResultSet rs = dbCon.query(sql);
     User user = null;
 
+    //Malthe: Added created_at and username which is used in login method
     try {
       // Get first object, since we only have one
       if (rs.next()) {
@@ -75,7 +76,7 @@ public class UserController {
     ResultSet rs = dbCon.query(sql);
     ArrayList<User> users = new ArrayList<User>();
 
-
+    //Malthe: Added created_at and username which is used in login method
     try {
       // Loop through DB Data
       while (rs.next()) {
@@ -160,9 +161,11 @@ public class UserController {
   }
 
   public static void updateUser(int userUpdatingID, User userUpdates) {
-    Log.writeLog(UserController.class.getName(), userUpdates, "Actually updating a user in DB", 0);
 
       User currentUser = getUser(userUpdatingID);
+
+    Log.writeLog(UserController.class.getName(), currentUser, "Actually updating a user in DB", 0);
+
 
       if(userUpdates.getEmail()==null){
           userUpdates.setEmail(currentUser.getEmail());
@@ -178,7 +181,7 @@ public class UserController {
       dbCon = new DatabaseController();
     }
 
-    //Creating the SQL statement
+    //Malthe: Creating the SQL statement
     String sql = "UPDATE user SET first_name = '" + userUpdates.getFirstname() + "'" +
             ", last_name = '" + userUpdates.getLastname() + "'" +
             ", email = '" + userUpdates.getEmail() + "'" +
@@ -186,7 +189,19 @@ public class UserController {
 
     dbCon.deleteUpdate(sql);
 
-//    System.out.println(userUpdatingID);
 
   }
+
+    public static void updatePassword(int id, String password) {
+
+      Log.writeLog(UserController.class.getName(), id, "Updating users password", 0);
+
+      if(dbCon == null){
+          dbCon = new DatabaseController();
+      }
+
+      String sql = "UPDATE user SET password = '" + password + "' WHERE id = " + id;
+
+      dbCon.deleteUpdate(sql);
+    }
 }

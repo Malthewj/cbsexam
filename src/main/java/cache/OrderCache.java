@@ -7,7 +7,7 @@ import utils.Config;
 import java.util.ArrayList;
 
 //TODO: Build this cache and use it : fixed
-//Used in orderendpoint in methods getOrders and createOrder
+//Malthe: Used in orderendpoint in methods getOrders and createOrder
 public class OrderCache {
 
     private ArrayList<Order> orders;

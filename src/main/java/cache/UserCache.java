@@ -7,7 +7,7 @@ import utils.Config;
 import java.util.ArrayList;
 
 //TODO: Build this cache and use it : fixed
-//Used in user endpoint in methods: getUsers, createUser, deleteUser, updateUser
+//Malthe: Used in user endpoint in methods: getUsers, createUser, deleteUser, updateUser
 public class UserCache {
 
     private ArrayList<User> users;

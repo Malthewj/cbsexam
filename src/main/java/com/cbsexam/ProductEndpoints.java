@@ -34,7 +34,7 @@ public class ProductEndpoints {
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(product);
 
-    //Add encryption to json rawString object(ref. utils Encryption)
+    //Malthe: Add encryption to json rawString object(ref. utils Encryption)
     json = Encryption.encryptDecryptXOR(json);
 
 //    new Gson().toJson(json);
@@ -49,7 +49,7 @@ public class ProductEndpoints {
   public Response getProducts() {
 
     // Call our cache-layer in order to get the product from the DB
-      // forceUpdate set to false since we only want to update if new products added
+      //Malthe: forceUpdate set to false since we only want to update if new products added
     ArrayList<Product> products = productCache.getProducts(false);
 
     // TODO: Add Encryption to JSON : fixed
@@ -74,7 +74,7 @@ public class ProductEndpoints {
     // Use the controller to add the user
     Product createdProduct = ProductController.createProduct(newProduct);
 
-    //ForceUpdate set to true to force a update of the cache
+    //Malthe: ForceUpdate set to true to force a update of the cache
     productCache.getProducts(true);
 
     // Get the user back with the added ID and return it to the user

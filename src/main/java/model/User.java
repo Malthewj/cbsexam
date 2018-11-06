@@ -10,6 +10,7 @@ public class User {
   private long createdTime;
   private String username;
 
+  //Malthe: added createdtime and username to constructor
   public User(int id, String firstname, String lastname, String password, String email, long createdTime, String username) {
     this.id = id;
     this.firstname = firstname;

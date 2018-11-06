@@ -17,6 +17,7 @@ public class UserEndpoints {
 
 
     public static UserCache userCache = new UserCache();
+    public static Hashing hashing = new Hashing();
 
   /**
    * @param idUser
@@ -49,8 +50,6 @@ public class UserEndpoints {
     // Return the user with the status code 200
     return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
 
-
-
   }
 
   /** @return Responses */
@@ -61,17 +60,17 @@ public class UserEndpoints {
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
 
-    // Get a list of users from the cache function
+    //Malthe: Get a list of users from the cache function
     ArrayList<User> users = userCache.getUsers(false);
 
     // TODO: Add Encryption to JSON : fixed
     // Transfer users to json in order to return it to the user
     String json = new Gson().toJson(users);
 
-    //Add encryption to json rawString object(ref. utils Encryption)
+    //Malthe: Add encryption to json rawString object(ref. utils Encryption)
     json = Encryption.encryptDecryptXOR(json);
 
-    //Remove comment notations to remove decrypting
+    //Malthe: Remove comment notations to remove decrypting
     json = Encryption.encryptDecryptXOR(json);
 
     // Return the users with the status code 200
@@ -89,7 +88,7 @@ public class UserEndpoints {
     // Use the controller to add the user
     User createUser = UserController.createUser(newUser);
 
-    //Force update of the user cache, since there is a new user in the ArrayList of users
+    //Malthe: Force update of the user cache, since there is a new user in the ArrayList of users
     userCache.getUsers(true);
 
     // Get the user back with the added ID and return it to the user
@@ -113,24 +112,26 @@ public class UserEndpoints {
 
     User userLogin = new Gson().fromJson(login, User.class);
 
-    //All users are getted in an arraylist
-      ArrayList<User> users = UserController.getUsers();
+    //Malthe: All users are getted in an arraylist
+      ArrayList<User> users = userCache.getUsers(false);
 
     for (User user : users) {
       if (user.getUsername().equals(userLogin.getUsername())) {
 
-        //Inputted "user"'s created time is set to found user.
-        userLogin.setCreatedTime(user.getCreatedTime());
-        Hashing hashing = new Hashing();
+        //Malthe: Created time is set to be the salt
+        hashing.setSalt(String.valueOf(user.getCreatedTime()));
 
-        //Created time is set to be the salt
-        hashing.setSalt(String.valueOf(userLogin.getCreatedTime()));
-
-        //The password string is hashed with a salt
+        //Malthe: The password string is hashed with a salt
         String password = hashing.hashWithSaltSHA(userLogin.getPassword());
 
+
         if(user.getPassword().equals(password)){
-          return Response.status(200).entity("You are logged in!").build();
+
+          String token = user.getUsername()+user.getEmail()+String.valueOf(user.getCreatedTime());
+
+          token = Encryption.encryptDecryptXOR(token);
+
+          return Response.status(200).entity("Your token is:\n" + token).build();
         }
 
       }
@@ -147,7 +148,7 @@ public class UserEndpoints {
 
     UserController.deleteUser(id);
 
-      //Update of the user cache, since there is deleted a User in the ArrayList of users
+      //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of users
       userCache.getUsers(true);
 
     // Return a response with status 200 and JSON as type
@@ -168,7 +169,7 @@ public class UserEndpoints {
     else if(userToUpdateID != 0){
         UserController.updateUser(userToUpdateID, updatedUserDataObj);
 
-        //Update of the user cache, since there is new information in the ArrayList of users
+        //Malthe: Update of the user cache, since there is new information in the ArrayList of users
         userCache.getUsers(true);
     }
 
@@ -179,6 +180,37 @@ public class UserEndpoints {
                     "Firstname: " + updatedUserDataObj.getFirstname() + "\n" +
             "Lastname: " + updatedUserDataObj.getLastname() + "\n" +
             "Email: " + updatedUserDataObj.getEmail()).build();
+  }
+
+  @POST
+    @Path("/updatepassword/{idUser}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updatePassword(@PathParam("idUser") int id, String passwordUpdate){
+
+    //Malthe: The inputtet password is saved in a user object and the password is saved in a string
+    User passwordupdate = new Gson().fromJson(passwordUpdate, User.class);
+    String password = passwordupdate.getPassword();
+
+      //Malthe: Getting the user which password needs to be updated to currentuser
+      User usertoUpdate = UserController.getUser(id);
+
+      //Malthe: Setting the salt to currentusers created time
+      hashing.setSalt(String.valueOf(usertoUpdate.getCreatedTime()));
+
+      //Malthe: Hashing the new password with createdtime as the salt
+      String newPassword = hashing.hashWithSaltSHA(password);
+
+      //Malthe: If the new password is not "new" or too short
+      if(usertoUpdate.getPassword().equals(newPassword) || password.length() < 7){
+          return Response.status(400).entity("Password must be new and 6 characters long").build();
+      }
+      //Malthe: Updating
+      UserController.updatePassword(id, newPassword);
+
+      //Malthe: Forcing a update in the cache since the list of users has changed
+      userCache.getUsers(true);
+
+      return Response.status(200).entity("Password is updated and hashed").build();
   }
 
 }

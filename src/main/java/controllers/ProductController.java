@@ -103,15 +103,14 @@ public class ProductController {
     }
 
     /* TODO: Use caching layer : fixed -
-    the to-do is misplayed since the caching layer should be used in ProductEndpoints*/
+    Malthe: the to-do is misplayed since the caching layer should be used in ProductEndpoints*/
 
     String sql = "SELECT * FROM product";
 
     ResultSet rs = dbCon.query(sql);
     ArrayList<Product> products = new ArrayList<Product>();
 
-    //Virker ikke
-    /* products = productCache.getProducts(true);*/
+    //Malthe: changed from name to product_name
 
     try {
       while (rs.next()) {

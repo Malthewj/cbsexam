@@ -53,7 +53,7 @@ public class OrderEndpoints {
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(orders);
 
-    //Add encryption to json rawString object(ref. utils Encryption)
+    //Malthe: Add encryption to json rawString object(ref. utils Encryption)
     json = Encryption.encryptDecryptXOR(json);
 
     // Return a response with status 200 and JSON as type
@@ -71,7 +71,7 @@ public class OrderEndpoints {
     // Use the controller to add the user
     Order createdOrder = OrderController.createOrder(newOrder);
 
-    //Force an update since the list of orders will have added one order
+    //Malthe: Force an update since the list of orders will have added one order
     orderCache.getOrders(true);
 
     // Get the user back with the added ID and return it to the user
