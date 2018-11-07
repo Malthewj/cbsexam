@@ -121,9 +121,9 @@ public class DatabaseController {
     }
 
     try{
-      PreparedStatement deleteStatement = connection.prepareStatement(sql);
+      PreparedStatement deleteUpdateStatement = connection.prepareStatement(sql);
 
-      deleteStatement.executeUpdate();
+      deleteUpdateStatement.executeUpdate();
 
     }catch (SQLException e){
       System.out.println(e.getMessage());

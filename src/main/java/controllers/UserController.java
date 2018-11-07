@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import cache.UserCache;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -12,7 +13,9 @@ import javax.ws.rs.core.Response;
 
 public class UserController {
 
+    private static UserCache userCache = new UserCache();
   private static DatabaseController dbCon;
+  private static Hashing hashing = new Hashing();
 
   public UserController() {
     dbCon = new DatabaseController();
@@ -44,7 +47,9 @@ public class UserController {
                 rs.getString("password"),
                 rs.getString("email"),
                 rs.getLong("created_at"),
-                    rs.getString("username"));
+                    rs.getString("username"),
+                    rs.getString("token"));
+
 
         // return the create object
         return user;
@@ -91,9 +96,10 @@ public class UserController {
                 rs.getString("password"),
                 rs.getString("email"),
                 rs.getLong("created_at"),
-                    rs.getString("username"));
+                    rs.getString("username"),
+                    rs.getString("token"));
 
-
+        user.setToken(null);
         // Add element to list
         users.add(user);
       }
@@ -163,6 +169,7 @@ public class UserController {
 
   }
 
+
   public static void updateUser(int userUpdatingID, User userUpdates) {
 
       User currentUser = getUser(userUpdatingID);
@@ -192,7 +199,6 @@ public class UserController {
 
     dbCon.deleteUpdate(sql);
 
-
   }
 
     public static void updatePassword(int id, String password) {
@@ -207,4 +213,41 @@ public class UserController {
 
       dbCon.deleteUpdate(sql);
     }
+
+    public static String auth(User userLogin) {
+
+        //Malthe: All users are getted in an arraylist
+        ArrayList<User> users = getUsers();
+
+        for (User user : users) {
+            if (user.getUsername().equals(userLogin.getUsername())) {
+
+                //Malthe: Created time is set to be the salt
+                hashing.setSalt(String.valueOf(user.getCreatedTime()));
+
+                //Malthe: The password string is hashed with a salt
+                String password = hashing.hashWithSaltSHA(userLogin.getPassword());
+
+                if(user.getPassword().equals(password)){
+
+                    String token = user.getUsername()+user.getEmail();
+
+                    hashing.setSalt(String.valueOf(System.currentTimeMillis()/1000L));
+
+                    token = hashing.hashWithSaltSHA(token);
+
+                    if(dbCon == null){
+                        dbCon = new DatabaseController();
+                    }
+
+                    dbCon.deleteUpdate("UPDATE user SET token = '" + token + "' WHERE id= " + user.getId());
+
+                    return token;
+                }
+
+            }
+        }
+        return null;
+    }
+
 }

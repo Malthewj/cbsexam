@@ -40,11 +40,10 @@ public class UserEndpoints {
         json = Encryption.encryptDecryptXOR(json);
 
 
-        ArrayList<User> userCheck = new ArrayList<>();
-        userCheck = UserController.getUsers();
+        ArrayList<User> userCheck = UserController.getUsers();
 
 
-        if(idUser == 0 || userCheck.size() < idUser){
+        if(idUser == 0 || userCheck.size()>=idUser){
             return Response.status(400).entity("Inputtet user ID is not valid. 0 in not valid").build();
         }
 
@@ -116,33 +115,12 @@ public class UserEndpoints {
 
     User userLogin = new Gson().fromJson(login, User.class);
 
-    //Malthe: All users are getted in an arraylist
-      ArrayList<User> users = userCache.getUsers(false);
+    String token = UserController.auth(userLogin);
 
-    for (User user : users) {
-      if (user.getUsername().equals(userLogin.getUsername())) {
-
-        //Malthe: Created time is set to be the salt
-        hashing.setSalt(String.valueOf(user.getCreatedTime()));
-
-        //Malthe: The password string is hashed with a salt
-        String password = hashing.hashWithSaltSHA(userLogin.getPassword());
-
-
-        if(user.getPassword().equals(password)){
-
-          String token = user.getUsername()+user.getEmail();
-
-          hashing.setSalt(String.valueOf(user.getCreatedTime()));
-
-          token = hashing.hashWithSaltSHA(token);
-
-
-          return Response.status(200).entity("Your token is:\n" + token).build();
-        }
-
-      }
+    if(token != null){
+        return Response.status(200).entity("Your token is:\n" + token).build();
     }
+
     // Return a response with status 200 and JSON as type
     return Response.status(400).entity("Not valid login attempt. Please match your input").build();
   }
@@ -160,12 +138,10 @@ public class UserEndpoints {
           }
 
           User userDeleting = UserController.getUser(id);
-          hashing.setSalt(String.valueOf(userDeleting.getCreatedTime()));
 
-          String tokencheck = hashing.hashWithSaltSHA(userDeleting.getUsername() + userDeleting.getEmail());
-
-          //Malthe: Checks if the user is admin since admin can delete everyone
-          if(token.equals("1935ffc5d59e235d1e7b2ba3c13a76f21af80c96358c802e222c720febe52972")){
+          //Malthe: Autherise the users token
+          //Skal være else if hvis admin reglen bliver implementeret
+          if(userDeleting.getToken().equals(token)){
               UserController.deleteUser(id);
 
               //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of users
@@ -173,23 +149,14 @@ public class UserEndpoints {
 
               // Return a response with status 200 and JSON as type
               return Response.status(200).entity("User with id " + id + " is now deleted").build();
+          } else{
+              return Response.status(400).entity("You can only delete yourself").build();
           }
-
-          else if(tokencheck.equals(token)){
-              UserController.deleteUser(id);
-
-              //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of users
-              userCache.getUsers(true);
-
-              // Return a response with status 200 and JSON as type
-              return Response.status(200).entity("User with id " + id + " is now deleted").build();
-          }
-
 
       }catch (Exception e){
           return Response.status(400).entity("User with granted ID does not exist").build();
       }
-      return Response.status(400).entity("You can only delete yourself").build();
+
   }
 
   // TODO: Make the system able to update users : fixed
@@ -209,16 +176,7 @@ public class UserEndpoints {
 
         User userToUpdate = UserController.getUser(userToUpdateID);
 
-        hashing.setSalt(String.valueOf(userToUpdate.getCreatedTime()));
-
-        String tokenCheck = userToUpdate.getUsername() + userToUpdate.getEmail();
-
-        tokenCheck = hashing.hashWithSaltSHA(tokenCheck);
-
-        if(updatedUserDataObj.getEmail().equals("") && updatedUserDataObj.getLastname().equals("") && updatedUserDataObj.getFirstname().isEmpty()) {
-            return Response.status(400).entity("ERROR - check input takes firstname, lastname or email").build();
-        }
-        else if(tokenCheck.equals(token)){
+        if(userToUpdate.getToken().equals(token)){
             UserController.updateUser(userToUpdate.getId(), updatedUserDataObj);
 
             //Malthe: Update of the user cache, since there is new information in the ArrayList of users
@@ -231,12 +189,13 @@ public class UserEndpoints {
                             "Lastname: " + updatedUserDataObj.getLastname() + "\n" +
                             "Email: " + updatedUserDataObj.getEmail()).build();
         }
+        else{
+            return Response.status(400).entity("You can only update yourself").build();
+        }
 
     }catch (Exception e){
         return Response.status(400).entity("User with granted ID does not exist").build();
     }
-
-    return Response.status(400).entity("You can only update yourself").build();
 
   }
 
@@ -270,11 +229,7 @@ public class UserEndpoints {
               return Response.status(400).entity("Password must be new and 6 characters long").build();
           }
 
-          String tokenCheck = usertoUpdate.getUsername() + usertoUpdate.getEmail();
-
-          tokenCheck = hashing.hashWithSaltSHA(tokenCheck);
-
-          if(tokenCheck.equals(token)){
+          if(usertoUpdate.getToken().equals(token)){
               //Malthe: Updating
               UserController.updatePassword(id, newPassword);
 
@@ -282,6 +237,8 @@ public class UserEndpoints {
               userCache.getUsers(true);
 
               return Response.status(200).entity("Password is updated and hashed").build();
+          }else{
+              return Response.status(400).entity("You can only update yourself").build();
           }
 
 
@@ -289,7 +246,6 @@ public class UserEndpoints {
           return Response.status(400).entity("User not found").build();
       }
 
-      return Response.status(400).entity("You can only update your own password").build();
   }
 
 }

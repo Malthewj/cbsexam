@@ -9,9 +9,10 @@ public class User {
   private String password;
   private long createdTime;
   private String username;
+  private String token;
 
   //Malthe: added createdtime and username to constructor
-  public User(int id, String firstname, String lastname, String password, String email, long createdTime, String username) {
+  public User(int id, String firstname, String lastname, String password, String email, long createdTime, String username, String token) {
     this.id = id;
     this.firstname = firstname;
     this.lastname = lastname;
@@ -19,6 +20,7 @@ public class User {
     this.email = email;
     this.createdTime = createdTime;
     this.username = username;
+    this.token = token;
   }
 
   public int getId() {
@@ -70,4 +72,8 @@ public class User {
   public String getUsername() { return username; }
 
   public void setUsername(String username) { this.username = username; }
+
+  public String getToken() { return token; }
+
+  public void setToken(String token) { this.token = token; }
 }
