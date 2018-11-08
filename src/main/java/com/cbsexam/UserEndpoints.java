@@ -24,11 +24,15 @@ public class UserEndpoints {
    * @return Responses
    */
   @GET
-  @Path("/{idUser}")
-  public Response getUser(@PathParam("idUser") int idUser) {
+  @Path("/{idUser}/{token}")
+  public Response getUser(@PathParam("idUser") int idUser, @PathParam("token") String token) {
 
       // TODO: What should happen if something breaks down? : fixed
     try{
+
+        if(token.equals("")){
+            return Response.status(400).entity("You are not yet logged in").build();
+        }
         // Use the ID to get the user from the controller.
         User user = UserController.getUser(idUser);
 
@@ -47,12 +51,17 @@ public class UserEndpoints {
             return Response.status(400).entity("Inputtet user ID is not valid. 0 in not valid").build();
         }
 
+        else if(user.getToken().equals(token)){
+            return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+        }
+        else{
+            return Response.status(400).entity("You can only view yourself").build();
+        }
         // Return the user with the status code 200
-        return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+
     }catch (Exception e){
         return Response.status(400).entity("User with granted ID does not exist").build();
     }
-
   }
 
   /** @return Responses */
@@ -102,7 +111,7 @@ public class UserEndpoints {
       // Return a response with status 200 and JSON as type
       return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
     } else {
-      return Response.status(400).entity("Could not create user - username might been taken").build();
+      return Response.status(400).entity("Could not create user - username might have been taken").build();
     }
   }
 
@@ -131,6 +140,7 @@ public class UserEndpoints {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response deleteUser(@PathParam("idUser") int id, @PathParam("token") String token) {
 
+      //Malthe: This endpoint is in a try-catch to avoid a 500 error, if no user exists with the granted ID
       try{
           //Malthe: Checks if the user is logged in and have granted a token
           if(token.equals("")){
@@ -166,6 +176,7 @@ public class UserEndpoints {
   public Response updateUser(@PathParam("idUser") int userToUpdateID,
                              String updatedUserData, @PathParam("token") String token) {
 
+      //Malthe: This endpoint is in a try-catch to avoid a 500 error, if no user exists with the granted ID
     try{
         //Malthe: Checks if the user is logged in and have granted a token
         if(token.equals("")){
@@ -205,6 +216,7 @@ public class UserEndpoints {
     public Response updatePassword(@PathParam("idUser")int id,
                                    String passwordUpdate, @PathParam("token") String token){
 
+      //Malthe: This endpoint is in a try-catch to avoid a 500 error, if no user exists with the granted ID
       try{
           //Malthe: Checks if the user is logged in and have granted a token
           if(token.equals("")){
@@ -243,7 +255,7 @@ public class UserEndpoints {
 
 
       }catch (Exception e){
-          return Response.status(400).entity("User not found").build();
+          return Response.status(400).entity("User with granted ID does not exist").build();
       }
 
   }
