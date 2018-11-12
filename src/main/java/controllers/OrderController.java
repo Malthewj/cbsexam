@@ -9,6 +9,8 @@ import model.Order;
 import model.User;
 import utils.Log;
 
+import javax.xml.crypto.Data;
+
 public class OrderController {
 
   private static DatabaseController dbCon;
@@ -137,7 +139,7 @@ public class OrderController {
       // Save the user to the database and save them back to initial order instance
       order.setCustomer(UserController.createUser(order.getCustomer()));
 
-      // TODO: Enable transactions in order for us to not save the order if somethings fails for some of the other inserts.
+      // TODO: Enable transactions in order for us to not save the order if somethings fails for some of the other inserts : fixed
 
       // Insert the product in the DB
       int orderID = dbCon.insert(
@@ -171,19 +173,37 @@ public class OrderController {
       for(LineItem item : order.getLineItems()){
         item = LineItemController.createLineItem(item, order.getId());
         items.add(item);
+
+        //Malthe: Commit the order to the database
+        DatabaseController.getConnection().commit();
       }
 
       order.setLineItems(items);
 
-      DatabaseController.getConnection().setAutoCommit(true);
       Log.writeLog(OrderController.class.getName(), order, "Actually creating a order in DB", 0);
-      // Return order
-      return order;
+
     }catch (SQLException e){
-      System.out.println(e.getMessage());
+      try{
+        //Malthe: Stops the connection to the database
+        DatabaseController.getConnection().rollback();
+      }catch (SQLException ex){
+        ex.printStackTrace();
+      }
       Log.writeLog(OrderController.class.getName(), order, "Creation of order failed", 0);
-      return null;
+
     }
+    finally {
+      try{
+        //Malthe: Set auto commit to true so other sql calls will not fail even though this order fails
+        DatabaseController.getConnection().setAutoCommit(true);
+      }catch (SQLException e){
+        e.printStackTrace();
+    }
+
+    }
+
+    // Return order
+    return order;
     }
 
 }

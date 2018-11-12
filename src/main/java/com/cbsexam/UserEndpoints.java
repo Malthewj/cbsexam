@@ -52,6 +52,7 @@ public class UserEndpoints {
         }
 
         else if(user.getToken().equals(token)){
+            json = Encryption.encryptDecryptXOR(json);
             return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
         }
         else{
@@ -66,8 +67,8 @@ public class UserEndpoints {
 
   /** @return Responses */
   @GET
-  @Path("/")
-  public Response getUsers() {
+  @Path("/{token}")
+  public Response getUsers(@PathParam("token") String token) {
 
     // Write to log that we are here
     Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
@@ -80,13 +81,20 @@ public class UserEndpoints {
     String json = new Gson().toJson(users);
 
     //Malthe: Add encryption to json rawString object(ref. utils Encryption)
-    json = Encryption.encryptDecryptXOR(json);
+      json = Encryption.encryptDecryptXOR(json);
 
-    //Malthe: Remove comment notations to remove decrypting
-    json = Encryption.encryptDecryptXOR(json);
+      //Malthe: If the user is logged in the user objects are decrypted
+    for(User user: users){
+        if(user.getToken() !=null && user.getToken().equals(token)){
+            //Malthe: Remove encryption when user is logged in
+            json = Encryption.encryptDecryptXOR(json);
+            // Return the users with the status code 200
+            return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+        }
 
-    // Return the users with the status code 200
-    return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+    }
+
+      return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
   }
 
   @POST

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import cache.UserCache;
+import com.cbsexam.UserEndpoints;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -72,6 +73,8 @@ public class UserController {
    */
   public static ArrayList<User> getUsers() {
 
+      boolean loggedIn = false;
+
     // Check for DB connection
     if (dbCon == null) {
       dbCon = new DatabaseController();
@@ -99,7 +102,7 @@ public class UserController {
                     rs.getString("username"),
                     rs.getString("token"));
 
-        user.setToken(null);
+
         // Add element to list
         users.add(user);
       }
@@ -234,7 +237,7 @@ public class UserController {
 
                     hashing.setSalt(String.valueOf(System.currentTimeMillis()/1000L));
 
-                    token = hashing.hashWithSaltSHA(token);
+                    token = hashing.hashWithSaltMD5(token);
 
                     if(dbCon == null){
                         dbCon = new DatabaseController();
