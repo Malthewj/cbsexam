@@ -73,7 +73,6 @@ public class UserController {
    */
   public static ArrayList<User> getUsers() {
 
-      boolean loggedIn = false;
 
     // Check for DB connection
     if (dbCon == null) {
@@ -244,6 +243,8 @@ public class UserController {
                     }
 
                     dbCon.deleteUpdate("UPDATE user SET token = '" + token + "' WHERE id= " + user.getId());
+
+                    userCache.getUsers(true);
 
                     return token;
                 }

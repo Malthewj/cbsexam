@@ -11,50 +11,84 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import controllers.ProductController;
+import controllers.UserController;
 import model.Order;
+import model.User;
 import utils.Encryption;
 
 @Path("order")
 public class OrderEndpoints {
 
-  public static OrderCache orderCache = new OrderCache();
+  private static OrderCache orderCache = new OrderCache();
+  private static ArrayList<User> users = UserController.getUsers();
 
   /**
    * @param idOrder
    * @return Responses
    */
   @GET
-  @Path("/{idOrder}")
-  public Response getOrder(@PathParam("idOrder") int idOrder) {
+  @Path("/{idOrder}/{token}")
+  public Response getOrder(@PathParam("idOrder") int idOrder, @PathParam("token") String token) {
 
-    // Call our controller-layer in order to get the order from the DB
-    Order order = OrderController.getOrder(idOrder);
+    try{
+      if(idOrder== OrderController.getOrder(idOrder).getId()){
+        boolean check = true;
+        // Call our controller-layer in order to get the order from the DB
+        Order order = OrderController.getOrder(idOrder);
 
-    // TODO: Add Encryption to JSON : fixed
-    // We convert the java object to json with GSON library imported in Maven
-    String json = new Gson().toJson(order);
+        // We convert the java object to json with GSON library imported in Maven
+        String json = new Gson().toJson(order);
 
-    //Add encryption to json rawString object(ref. utils Encryption)
-    json = Encryption.encryptDecryptXOR(json);
+        //Malthe: Checks if the granted token exists and the user is logged in
+        for(User user: users){
+          if(user.getToken() != null && user.getToken().equals(token)){
+            check = false;
+          }
+        }
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+        // TODO: Add Encryption to JSON : fixed
+        if(check){
+          //Malthe: Add encryption to json rawString object(ref. utils Encryption)
+          json = Encryption.encryptDecryptXOR(json);
+        }
+
+        // Return a response with status 200 and JSON as type
+        return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+      }
+    }catch (Exception e){
+      System.out.println(e.getMessage());
+      return Response.status(400).entity("Order does not exist").build();
+    }
+    return null;
   }
 
   /** @return Responses */
   @GET
-  @Path("/")
-  public Response getOrders() {
+  @Path("/{token}")
+  public Response getOrders(@PathParam("token") String token) {
+
+    boolean check = true;
 
     // Call our cache-layer in order to get the order from the DB
     ArrayList<Order> orders = orderCache.getOrders(false);
 
-    // TODO: Add Encryption to JSON : fixed
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(orders);
 
-    //Malthe: Add encryption to json rawString object(ref. utils Encryption)
-    json = Encryption.encryptDecryptXOR(json);
+    //Malthe: Checks if the granted token exists and the user is logged in
+    for(User user: users){
+      if(user.getToken() != null && user.getToken().equals(token)){
+        check = false;
+      }
+    }
+
+    // TODO: Add Encryption to JSON : fixed
+    if(check){
+      //Malthe: Add encryption to json rawString object(ref. utils Encryption)
+      json = Encryption.encryptDecryptXOR(json);
+    }
 
     // Return a response with status 200 and JSON as type
     return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();

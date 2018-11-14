@@ -40,10 +40,6 @@ public class UserEndpoints {
         // Convert the user object to json in order to return the object
         String json = new Gson().toJson(user);
 
-        //Add encryption to json rawString object(ref. utils Encryption)
-        json = Encryption.encryptDecryptXOR(json);
-
-
         ArrayList<User> userCheck = UserController.getUsers();
 
 
@@ -53,10 +49,11 @@ public class UserEndpoints {
 
         else if(user.getToken().equals(token)){
             // Return the user with the status code 200
-            json = Encryption.encryptDecryptXOR(json);
             return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
         } else{
-            return Response.status(400).entity("Token not valid for granted ID").build();
+            //Add encryption to json rawString object(ref. utils Encryption)
+            json = Encryption.encryptDecryptXOR(json);
+            return Response.status(400).entity("Token not valid for granted id\n" + json).build();
         }
 
 
@@ -76,8 +73,6 @@ public class UserEndpoints {
     //Malthe: Get a list of users from the cache function
     ArrayList<User> users = userCache.getUsers(false);
 
-    // TODO: Add Encryption to JSON : fixed
-
       boolean check = true;
 
       //Malthe: Checks if the granted token is valid in DB
@@ -94,11 +89,13 @@ public class UserEndpoints {
       // Transfer users to json in order to return it to the user
       String json = new Gson().toJson(users);
 
+      // TODO: Add Encryption to JSON : fixed
       //Malthe: Add encryption to json rawString object(ref. utils Encryption) if no user is found
       if (check) {
         json = Encryption.encryptDecryptXOR(json);
     }
     // Return the users with the status code 200
+
       return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
   }
 
