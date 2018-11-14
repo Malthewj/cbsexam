@@ -237,7 +237,7 @@ public class UserController {
 
                     hashing.setSalt(String.valueOf(System.currentTimeMillis()/1000L));
 
-                    token = hashing.hashWithSaltMD5(token);
+                    token = hashing.hashWithSaltSHA(token);
 
                     if(dbCon == null){
                         dbCon = new DatabaseController();

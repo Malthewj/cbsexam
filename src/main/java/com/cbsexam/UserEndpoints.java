@@ -52,13 +52,13 @@ public class UserEndpoints {
         }
 
         else if(user.getToken().equals(token)){
+            // Return the user with the status code 200
             json = Encryption.encryptDecryptXOR(json);
             return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+        } else{
+            return Response.status(400).entity("Token not valid for granted ID").build();
         }
-        else{
-            return Response.status(400).entity("You can only view yourself").build();
-        }
-        // Return the user with the status code 200
+
 
     }catch (Exception e){
         return Response.status(400).entity("User with granted ID does not exist").build();
@@ -77,23 +77,28 @@ public class UserEndpoints {
     ArrayList<User> users = userCache.getUsers(false);
 
     // TODO: Add Encryption to JSON : fixed
-    // Transfer users to json in order to return it to the user
-    String json = new Gson().toJson(users);
 
-    //Malthe: Add encryption to json rawString object(ref. utils Encryption)
-      json = Encryption.encryptDecryptXOR(json);
+      boolean check = true;
 
-      //Malthe: If the user is logged in the user objects are decrypted
+      //Malthe: Checks if the granted token is valid in DB
     for(User user: users){
         if(user.getToken() !=null && user.getToken().equals(token)){
-            //Malthe: Remove encryption when user is logged in
-            json = Encryption.encryptDecryptXOR(json);
-            // Return the users with the status code 200
-            return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+
+            //Malthe: sets the check to false so the json String object is not encrypted if a valid token is granted
+            check = false;
         }
+        //Malthe: Set the token to null locally so it will not be printed
+        user.setToken(null);
 
     }
+      // Transfer users to json in order to return it to the user
+      String json = new Gson().toJson(users);
 
+      //Malthe: Add encryption to json rawString object(ref. utils Encryption) if no user is found
+      if (check) {
+        json = Encryption.encryptDecryptXOR(json);
+    }
+    // Return the users with the status code 200
       return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
   }
 
