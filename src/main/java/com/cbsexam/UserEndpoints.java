@@ -262,4 +262,27 @@ public class UserEndpoints {
 
   }
 
+  @GET
+  @Path("/logout/{token}")
+  public Response logout(@PathParam("token")String token){
+
+      ArrayList<User> users = userCache.getUsers(false);
+
+      for(User user : users){
+          if(user.getToken() != null && user.getToken().equals(token)){
+
+              UserController.logout(user);
+
+              //Malthe: Cache update since token will be updated
+              userCache.getUsers(true);
+
+              return Response.status(200).entity("You are now logged out").build();
+
+          }
+      }
+
+      // Return a response with status 200 and JSON as type
+      return Response.status(400).entity("Session ID not valid").build();
+  }
+
 }

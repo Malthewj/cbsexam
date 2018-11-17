@@ -221,6 +221,8 @@ public class UserController {
         //Malthe: All users are getted in an arraylist
         ArrayList<User> users = getUsers();
 
+        Log.writeLog(UserController.class.getName(), userLogin, "Login attempt", 0);
+
         for (User user : users) {
             if (user.getUsername().equals(userLogin.getUsername())) {
 
@@ -244,12 +246,28 @@ public class UserController {
 
                     dbCon.deleteUpdate("UPDATE user SET token = '" + token + "' WHERE id= " + user.getId());
 
+                    Log.writeLog(UserController.class.getName(), userLogin, "Login successful", 0);
+
                     return token;
                 }
 
             }
         }
         return null;
+    }
+
+    public static void logout(User user){
+
+        Log.writeLog(UserController.class.getName(), user, "Logged out", 0);
+
+      if(dbCon == null){
+          dbCon = new DatabaseController();
+      }
+
+      user.setToken(null);
+
+      dbCon.deleteUpdate("UPDATE user SET token = '" + user.getToken() + "'WHERE id=" + user.getId());
+
     }
 
 }
