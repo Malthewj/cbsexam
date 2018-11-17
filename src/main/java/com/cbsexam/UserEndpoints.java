@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import model.User;
 import utils.Encryption;
 import utils.Hashing;
@@ -40,14 +42,7 @@ public class UserEndpoints {
         // Convert the user object to json in order to return the object
         String json = new Gson().toJson(user);
 
-        ArrayList<User> userCheck = UserController.getUsers();
-
-
-        if(idUser == 0 || userCheck.size()>=idUser){
-            return Response.status(400).entity("Inputtet user ID is not valid. 0 in not valid").build();
-        }
-
-        else if(user.getToken().equals(token)){
+       if(user.getToken().equals(token)){
             // Return the user with the status code 200
             return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
         } else{
@@ -67,11 +62,9 @@ public class UserEndpoints {
   @Path("/{token}")
   public Response getUsers(@PathParam("token") String token) {
 
-    // Write to log that we are here
-    Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
-
     //Malthe: Get a list of users from the cache function
     ArrayList<User> users = userCache.getUsers(false);
+    ArrayList<User> usersWithoutToken = new ArrayList<>();
 
       boolean check = true;
 
@@ -81,21 +74,28 @@ public class UserEndpoints {
 
             //Malthe: sets the check to false so the json String object is not encrypted if a valid token is granted
             check = false;
-        }
-        //Malthe: Set the token to null locally so it will not be printed
-        user.setToken(null);
 
+            // Write to log that we are here
+            Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
+        }
+        //Malthe: Create new User object without password and token
+        User user1 = new User(user.getId(), user.getFirstname(), user.getLastname(),null, user.getEmail(), user.getCreatedTime(), user.getUsername(), null);
+
+        //Malthe: Add to the arraylist that shoukd be printed
+        usersWithoutToken.add(user1);
     }
       // Transfer users to json in order to return it to the user
-      String json = new Gson().toJson(users);
+      String json = new Gson().toJson(usersWithoutToken);
 
       // TODO: Add Encryption to JSON : fixed
       //Malthe: Add encryption to json rawString object(ref. utils Encryption) if no user is found
       if (check) {
         json = Encryption.encryptDecryptXOR(json);
+          // Write to log that we are here
+          Log.writeLog(this.getClass().getName(), this, "Get all users encrypted", 0);
     }
-    // Return the users with the status code 200
 
+    // Return the users with the status code 200
       return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
   }
 
@@ -136,6 +136,9 @@ public class UserEndpoints {
 
     String token = UserController.auth(userLogin);
 
+    //Malthe: Cache update since token will be updated
+    userCache.getUsers(true);
+
     if(token != null){
         return Response.status(200).entity("Your token is:\n" + token).build();
     }
@@ -146,88 +149,78 @@ public class UserEndpoints {
 
   // TODO: Make the system able to delete users : fixed
   @POST
-  @Path("/delete/{idUser}/{token}")
+  @Path("/delete/{token}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response deleteUser(@PathParam("idUser") int id, @PathParam("token") String token) {
+  public Response deleteUser(@PathParam("token") String token) {
 
-      //Malthe: This endpoint is in a try-catch to avoid a 500 error, if no user exists with the granted ID
-      try{
+
           //Malthe: Checks if the user is logged in and have granted a token
           if(token.equals("")){
               return Response.status(400).entity("You're not logged in yet").build();
           }
 
-          User userDeleting = UserController.getUser(id);
+          ArrayList<User> users = userCache.getUsers(false);
 
           //Malthe: Autherise the users token
-          //Skal være else if hvis admin reglen bliver implementeret
-          if(userDeleting.getToken().equals(token)){
-              UserController.deleteUser(id);
+          for(User user: users){
+              if(user.getToken() !=null && user.getToken().equals(token)){
 
-              //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of users
-              userCache.getUsers(true);
+                  User userDeleting = UserController.getUser(user.getId());
 
-              // Return a response with status 200 and JSON as type
-              return Response.status(200).entity("User with id " + id + " is now deleted").build();
-          } else{
-              return Response.status(400).entity("You can only delete yourself").build();
+                  UserController.deleteUser(userDeleting.getId());
+
+                  //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of users
+                  userCache.getUsers(true);
+
+                  // Return a response with status 200 and JSON as type
+                  return Response.status(200).entity("User with id " + userDeleting.getId() + " is now deleted").build();
+              }
+
           }
 
-      }catch (Exception e){
-          return Response.status(400).entity("User with granted ID does not exist").build();
-      }
-
+      return Response.status(400).entity("Your session ID is not valid").build();
   }
 
   // TODO: Make the system able to update users : fixed
   @POST
-  @Path("/update/{idUser}/{token}")
+  @Path("/update/{token}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response updateUser(@PathParam("idUser") int userToUpdateID,
-                             String updatedUserData, @PathParam("token") String token) {
+  public Response updateUser(String updatedUserData, @PathParam("token") String token) {
 
-      //Malthe: This endpoint is in a try-catch to avoid a 500 error, if no user exists with the granted ID
-    try{
         //Malthe: Checks if the user is logged in and have granted a token
         if(token.equals("")){
             return Response.status(400).entity("You're not logged in yet").build();
         }
 
+        ArrayList<User> users = userCache.getUsers(false);
+
         User updatedUserDataObj = new Gson().fromJson(updatedUserData, User.class);
 
-        User userToUpdate = UserController.getUser(userToUpdateID);
+        for(User user:users){
+            if(user.getToken() != null && user.getToken().equals(token)){
 
-        if(userToUpdate.getToken().equals(token)){
-            UserController.updateUser(userToUpdate.getId(), updatedUserDataObj);
+                UserController.updateUser(user.getId(), updatedUserDataObj);
 
-            //Malthe: Update of the user cache, since there is new information in the ArrayList of users
-            userCache.getUsers(true);
+                //Malthe: Update of the user cache, since there is new information in the ArrayList of users
+                userCache.getUsers(true);
 
-            // Return a response with status 200 and JSON as type
-            return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(
-                    "User with ID " + userToUpdateID + " is now updated to:\n" +
-                            "Firstname: " + updatedUserDataObj.getFirstname() + "\n" +
-                            "Lastname: " + updatedUserDataObj.getLastname() + "\n" +
-                            "Email: " + updatedUserDataObj.getEmail()).build();
-        }
-        else{
-            return Response.status(400).entity("You can only update yourself").build();
+                // Return a response with status 200 and JSON as type
+                return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(
+                        "User with ID " + user.getId() + " is now updated to:\n" +
+                                "Firstname: " + updatedUserDataObj.getFirstname() + "\n" +
+                                "Lastname: " + updatedUserDataObj.getLastname() + "\n" +
+                                "Email: " + updatedUserDataObj.getEmail()).build();
+            }
         }
 
-    }catch (Exception e){
-        return Response.status(400).entity("User with granted ID does not exist").build();
-    }
-
+      return Response.status(400).entity("Your session ID is not valid").build();
   }
 
   @POST
-    @Path("/updatepassword/{idUser}/{token}")
+    @Path("/updatepassword/{token}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updatePassword(@PathParam("idUser")int id,
-                                   String passwordUpdate, @PathParam("token") String token){
+    public Response updatePassword(String passwordUpdate, @PathParam("token") String token){
 
-      //Malthe: This endpoint is in a try-catch to avoid a 500 error, if no user exists with the granted ID
-      try{
           //Malthe: Checks if the user is logged in and have granted a token
           if(token.equals("")){
               return Response.status(400).entity("You're not logged in yet").build();
@@ -237,36 +230,35 @@ public class UserEndpoints {
           User passwordupdate = new Gson().fromJson(passwordUpdate, User.class);
           String password = passwordupdate.getPassword();
 
-          //Malthe: Getting the user which password needs to be updated to currentuser
-          User usertoUpdate = UserController.getUser(id);
+          ArrayList<User> users = userCache.getUsers(false);
 
-          //Malthe: Setting the salt to currentusers created time
-          hashing.setSalt(String.valueOf(usertoUpdate.getCreatedTime()));
+          for(User user: users){
+              if(user.getToken()!= null && user.getToken().equals(token)){
+                  //Malthe: Getting the user which password needs to be updated to currentuser
+                  User usertoUpdate = UserController.getUser(user.getId());
 
-          //Malthe: Hashing the new password with createdtime as the salt
-          String newPassword = hashing.hashWithSaltSHA(password);
+                  //Malthe: Setting the salt to currentusers created time
+                  hashing.setSalt(String.valueOf(usertoUpdate.getCreatedTime()));
 
-          //Malthe: If the new password is not "new" or too short
-          if(usertoUpdate.getPassword().equals(newPassword) || password.length() < 7){
-              return Response.status(400).entity("Password must be new and 6 characters long").build();
+                  //Malthe: Hashing the new password with createdtime as the salt
+                  String newPassword = hashing.hashWithSaltSHA(password);
+
+                  //Malthe: If the new password is not "new" or too short
+                  if(usertoUpdate.getPassword().equals(newPassword) || password.length() < 7){
+                      return Response.status(400).entity("Password must be new and 6 characters long").build();
+                  }else{
+                      //Malthe: Updating
+                      UserController.updatePassword(user.getId(), newPassword);
+
+                      //Malthe: Forcing a update in the cache since the list of users has changed
+                      userCache.getUsers(true);
+
+                      return Response.status(200).entity("Password is updated and hashed").build();
+                  }
+              }
           }
 
-          if(usertoUpdate.getToken().equals(token)){
-              //Malthe: Updating
-              UserController.updatePassword(id, newPassword);
-
-              //Malthe: Forcing a update in the cache since the list of users has changed
-              userCache.getUsers(true);
-
-              return Response.status(200).entity("Password is updated and hashed").build();
-          }else{
-              return Response.status(400).entity("You can only update yourself").build();
-          }
-
-
-      }catch (Exception e){
-          return Response.status(400).entity("User with granted ID does not exist").build();
-      }
+      return Response.status(400).entity("Session ID not valid").build();
 
   }
 

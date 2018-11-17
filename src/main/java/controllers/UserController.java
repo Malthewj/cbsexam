@@ -232,7 +232,7 @@ public class UserController {
 
                 if(user.getPassword().equals(password)){
 
-                    String token = user.getUsername()+user.getEmail();
+                    String token = user.getId()+user.getUsername();
 
                     hashing.setSalt(String.valueOf(System.currentTimeMillis()/1000L));
 
@@ -243,8 +243,6 @@ public class UserController {
                     }
 
                     dbCon.deleteUpdate("UPDATE user SET token = '" + token + "' WHERE id= " + user.getId());
-
-                    userCache.getUsers(true);
 
                     return token;
                 }

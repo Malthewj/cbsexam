@@ -1,7 +1,5 @@
 package model;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
-
 public class User {
 
   public int id;
