@@ -40,6 +40,7 @@ public class UserEndpoints {
 
             for(User user : users){
                 if(user.getToken()!= null && user.getToken().equals(token)){
+
                     json = new Gson().toJson(user);
                     // Return the user with the status code 200
                     return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
