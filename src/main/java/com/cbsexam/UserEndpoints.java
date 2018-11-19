@@ -21,41 +21,45 @@ public class UserEndpoints {
     public static UserCache userCache = new UserCache();
     public static Hashing hashing = new Hashing();
 
-  /**
-   * @param idUser
-   * @return Responses
-   */
-  @GET
-  @Path("/{idUser}/{token}")
-  public Response getUser(@PathParam("idUser") int idUser, @PathParam("token") String token) {
 
-      // TODO: What should happen if something breaks down? : fixed
-    try{
+    /**
+     * @param token
+     * @return Responses
+     */
+    @GET
+    @Path("/byID/{token}")
+    public Response getUser(@PathParam("token") String token){
 
-        if(token.equals("")){
-            return Response.status(400).entity("You are not yet logged in").build();
-        }
-        // Use the ID to get the user from the controller.
-        User user = UserController.getUser(idUser);
 
-        // TODO: Add Encryption to JSON : fixed
-        // Convert the user object to json in order to return the object
-        String json = new Gson().toJson(user);
+        // TODO: What should happen if something breaks down? : fixed
 
-       if(user.getToken().equals(token)){
-            // Return the user with the status code 200
-            return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
-        } else{
+        try{
+            String json;
+
+            ArrayList<User> users = userCache.getUsers(false);
+
+            for(User user : users){
+                if(user.getToken()!= null && user.getToken().equals(token)){
+                    json = new Gson().toJson(user);
+                    // Return the user with the status code 200
+                    return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+                }
+            }
+
+            json = new Gson().toJson(users);
+
+            // TODO: Add Encryption to JSON : fixed
             //Add encryption to json rawString object(ref. utils Encryption)
             json = Encryption.encryptDecryptXOR(json);
-            return Response.status(400).entity("Token not valid for granted id\n" + json).build();
+            return Response.status(400).entity("Session ID not valid\n" + json).build();
+
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return Response.status(400).entity("Something went wrong").build();
         }
 
-
-    }catch (Exception e){
-        return Response.status(400).entity("User with granted ID does not exist").build();
     }
-  }
+
 
   /** @return Responses */
   @GET
@@ -79,7 +83,7 @@ public class UserEndpoints {
             Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
         }
         //Malthe: Create new User object without password and token
-        User user1 = new User(user.getId(), user.getFirstname(), user.getLastname(),null, user.getEmail(), user.getCreatedTime(), user.getUsername(), null);
+        User user1 = new User(0, user.getFirstname(), user.getLastname(),null, user.getEmail(), user.getCreatedTime(), user.getUsername(), null);
 
         //Malthe: Add to the arraylist that shoukd be printed
         usersWithoutToken.add(user1);

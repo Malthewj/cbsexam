@@ -134,6 +134,7 @@ public class OrderController {
     }
     try{
       DatabaseController.getConnection().setAutoCommit(false);
+
       // Save addresses to database and save them back to initial order instance
       order.setBillingAddress(AddressController.createAddress(order.getBillingAddress()));
       order.setShippingAddress(AddressController.createAddress(order.getShippingAddress()));

@@ -91,7 +91,7 @@ public class DatabaseController {
       connection = getConnection();
 
     try {
-        //connection.setAutoCommit(false);
+
       // Build the statement up in a safe way
       PreparedStatement statement =
           connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
