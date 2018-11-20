@@ -45,7 +45,7 @@ public class OrderController {
         ArrayList<LineItem> lineItems = LineItemController.getLineItemsForOrder(rs.getInt("id"));
 
         User user1 = new User(
-                rs.getInt("id"),
+                rs.getInt("user_id"),
                 rs.getString("first_name"),
                 rs.getString("last_name"),
                 rs.getString("password"),
@@ -53,6 +53,8 @@ public class OrderController {
                 rs.getLong("created_at"),
                 rs.getString("username"),
                 rs.getString("token"));
+        user1.setToken(null);
+        user1.setPassword(null);
 
         Address billing = new Address(
                 rs.getInt("billing_address_id"),
@@ -122,7 +124,7 @@ public class OrderController {
         ArrayList<LineItem> lineItems = LineItemController.getLineItemsForOrder(rs.getInt("id"));
 
         User user1 = new User(
-                rs.getInt("id"),
+                rs.getInt("user_id"),
                 rs.getString("first_name"),
                 rs.getString("last_name"),
                 rs.getString("password"),

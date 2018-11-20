@@ -172,21 +172,19 @@ public class UserController {
   }
 
 
-  public static void updateUser(int userUpdatingID, User userUpdates) {
+  public static void updateUser(User user, User userUpdates) {
 
-      User currentUser = getUser(userUpdatingID);
-
-    Log.writeLog(UserController.class.getName(), currentUser, "Actually updating a user in DB", 0);
+      Log.writeLog(UserController.class.getName(), user, "Actually updating a user in DB", 0);
 
 
       if(userUpdates.getEmail()==null){
-          userUpdates.setEmail(currentUser.getEmail());
+          userUpdates.setEmail(user.getEmail());
       }
       if(userUpdates.getLastname()==null){
-          userUpdates.setLastname(currentUser.getLastname());
+          userUpdates.setLastname(user.getLastname());
       }
       if(userUpdates.getFirstname()==null){
-          userUpdates.setFirstname(currentUser.getFirstname());
+          userUpdates.setFirstname(user.getFirstname());
       }
 
     if(dbCon == null){
@@ -197,7 +195,7 @@ public class UserController {
     String sql = "UPDATE user SET first_name = '" + userUpdates.getFirstname() + "'" +
             ", last_name = '" + userUpdates.getLastname() + "'" +
             ", email = '" + userUpdates.getEmail() + "'" +
-            " WHERE id = " + userUpdatingID;
+            " WHERE id = " + user.getId();
 
     dbCon.deleteUpdate(sql);
 
@@ -264,9 +262,8 @@ public class UserController {
           dbCon = new DatabaseController();
       }
 
-      user.setToken(null);
 
-      dbCon.deleteUpdate("UPDATE user SET token = '" + user.getToken() + "'WHERE id=" + user.getId());
+      dbCon.deleteUpdate("UPDATE user SET token = null WHERE id=" + user.getId());
 
     }
 

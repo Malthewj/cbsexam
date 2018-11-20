@@ -32,7 +32,6 @@ public class UserEndpoints {
 
 
         // TODO: What should happen if something breaks down? : fixed
-
         try{
             String json;
 
@@ -62,7 +61,7 @@ public class UserEndpoints {
     }
 
 
-  /** @return Responses */
+    /** @return Responses */
   @GET
   @Path("/{token}")
   public Response getUsers(@PathParam("token") String token) {
@@ -159,26 +158,20 @@ public class UserEndpoints {
   public Response deleteUser(@PathParam("token") String token) {
 
 
-          //Malthe: Checks if the user is logged in and have granted a token
-          if(token.equals("")){
-              return Response.status(400).entity("You're not logged in yet").build();
-          }
-
           ArrayList<User> users = userCache.getUsers(false);
 
           //Malthe: Autherise the users token
           for(User user: users){
               if(user.getToken() !=null && user.getToken().equals(token)){
 
-                  User userDeleting = UserController.getUser(user.getId());
-
-                  UserController.deleteUser(userDeleting.getId());
+                  //Malthe: Calls method in usercontroller that deletes found user
+                  UserController.deleteUser(user.getId());
 
                   //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of users
                   userCache.getUsers(true);
 
                   // Return a response with status 200 and JSON as type
-                  return Response.status(200).entity("User with id " + userDeleting.getId() + " is now deleted").build();
+                  return Response.status(200).entity("User with id " + user.getId() + " is now deleted").build();
               }
 
           }
@@ -192,10 +185,6 @@ public class UserEndpoints {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response updateUser(String updatedUserData, @PathParam("token") String token) {
 
-        //Malthe: Checks if the user is logged in and have granted a token
-        if(token.equals("")){
-            return Response.status(400).entity("You're not logged in yet").build();
-        }
 
         ArrayList<User> users = userCache.getUsers(false);
 
@@ -204,7 +193,8 @@ public class UserEndpoints {
         for(User user:users){
             if(user.getToken() != null && user.getToken().equals(token)){
 
-                UserController.updateUser(user.getId(), updatedUserDataObj);
+                //Malthe: Calls method in usercontroller that updates with new info
+                UserController.updateUser(user, updatedUserDataObj);
 
                 //Malthe: Update of the user cache, since there is new information in the ArrayList of users
                 userCache.getUsers(true);
@@ -222,14 +212,9 @@ public class UserEndpoints {
   }
 
   @POST
-    @Path("/updatepassword/{token}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updatePassword(String passwordUpdate, @PathParam("token") String token){
-
-          //Malthe: Checks if the user is logged in and have granted a token
-          if(token.equals("")){
-              return Response.status(400).entity("You're not logged in yet").build();
-          }
+  @Path("/updatepassword/{token}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response updatePassword(String passwordUpdate, @PathParam("token") String token){
 
           //Malthe: The inputtet password is saved in a user object and the password is saved in a string
           User passwordupdate = new Gson().fromJson(passwordUpdate, User.class);
