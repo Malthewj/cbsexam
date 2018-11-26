@@ -108,25 +108,30 @@ public class UserEndpoints {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response createUser(String body) {
 
-    // Read the json from body and transfer it to a user class
-    User newUser = new Gson().fromJson(body, User.class);
+    try{
+        // Read the json from body and transfer it to a user class
+        User newUser = new Gson().fromJson(body, User.class);
 
-    // Use the controller to add the user
-    User createUser = UserController.createUser(newUser);
+        // Use the controller to add the user
+        User createUser = UserController.createUser(newUser);
 
-    //Malthe: Force update of the user cache, since there is a new user in the ArrayList of users
-    userCache.getUsers(true);
+        //Malthe: Force update of the user cache, since there is a new user in the ArrayList of users
+        userCache.getUsers(true);
 
-    // Get the user back with the added ID and return it to the user
-    String json = new Gson().toJson(createUser);
+        // Get the user back with the added ID and return it to the user
+        String json = new Gson().toJson(createUser);
 
-    // Checks if the username is already taken
-    if (createUser != null) {
-      // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
-    } else {
-      return Response.status(400).entity("Could not create user - username might have been taken").build();
+        // Checks if the username is already taken
+        if (createUser != null) {
+            // Return a response with status 200 and JSON as type
+            return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+        } else {
+            return Response.status(400).entity("Could not create user - username might have been taken").build();
+        }
+    } catch (Exception e){
+        return Response.status(400).entity("Username already taken").build();
     }
+
   }
 
   // TODO: Make a smart way of login in without having to enter ID, maybe not possible : fixed (implemented username)
