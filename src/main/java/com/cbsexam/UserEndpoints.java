@@ -33,6 +33,11 @@ public class UserEndpoints {
 
         // TODO: What should happen if something breaks down? : fixed
         try {
+
+            if(token.equals("")){
+                return Response.status(400).entity("No token").build();
+            }
+
             String json;
 
             ArrayList<User> users = userCache.getUsers(false);
@@ -66,6 +71,8 @@ public class UserEndpoints {
         @Path("/{token}")
         public Response getUsers (@PathParam("token") String token){
 
+
+        try{
         //Malthe: Get a list of users from the cache function
         ArrayList<User> users = userCache.getUsers(false);
         ArrayList<User> usersWithoutToken = new ArrayList<>();
@@ -101,6 +108,10 @@ public class UserEndpoints {
 
         // Return the users with the status code 200
         return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+
+        }catch (Exception e){
+            return Response.status(400).entity("Couldn't find users").build();
+        }
     }
 
         @POST
