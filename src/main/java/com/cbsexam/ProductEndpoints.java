@@ -32,11 +32,11 @@ public class ProductEndpoints {
   public Response getProduct(@PathParam("idProduct") int idProduct, @PathParam("token") String token) {
 
     try{
-      if(idProduct==ProductController.getProduct(idProduct).getId()){
-        boolean check = true;
 
         // Call our controller-layer in order to get the order from the DB
         Product product = ProductController.getProduct(idProduct);
+
+        boolean check = true;
 
         // We convert the java object to json with GSON library imported in Maven
         String json = new Gson().toJson(product);
@@ -56,14 +56,13 @@ public class ProductEndpoints {
 
         // Return a response with status 200 and JSON as type
         return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
-      }
+
 
     }
     catch (Exception e){
       System.out.println(e.getMessage());
       return Response.status(400).entity("Product does not exist").build();
     }
-    return null;
   }
 
   /** @return Responses */

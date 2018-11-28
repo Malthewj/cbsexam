@@ -71,7 +71,6 @@ public class UserEndpoints {
         @Path("/{token}")
         public Response getUsers (@PathParam("token") String token){
 
-
         try{
         //Malthe: Get a list of users from the cache function
         ArrayList<User> users = userCache.getUsers(false);

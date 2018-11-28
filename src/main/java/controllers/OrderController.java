@@ -132,6 +132,8 @@ public class OrderController {
                 rs.getLong("created_at"),
                 rs.getString("username"),
                 rs.getString("token"));
+          user1.setToken(null);
+          user1.setPassword(null);
 
         Address billing = new Address(
                 rs.getInt("billing_address_id"),
