@@ -28,7 +28,7 @@ public class ProductEndpoints {
   @GET
   @Path("")
   public Response standardAnswer(){
-    return Response.status(400).entity("You need a session ID to view products \n" +
+    return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You need a session ID to view products \n" +
             "You can access it at the following path: /user/login").build();
   }
 
