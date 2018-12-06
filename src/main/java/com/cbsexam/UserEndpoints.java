@@ -22,16 +22,25 @@ public class UserEndpoints {
     public static UserCache userCache = new UserCache();
     public static Hashing hashing = new Hashing();
 
-        /**
-         * @param token
-         * @return Responses
-         */
-        @GET
-        @Path("/byID/{token}")
-        public Response getUser (@PathParam("token") String token){
+    //Malthe: added standard response if user don't insert token i the URL
+    /** @return Responses */
+    @GET
+    @Path("")
+    public Response standardAnswer(){
+        return Response.status(400).entity("You need a session ID to view users").build();
+    }
 
+
+    /**
+     * @param token
+     * @return Responses
+     */
+    @GET
+    @Path("/byID/{token}")
+    public Response getUser (@PathParam("token") String token){
 
         // TODO: What should happen if something breaks down? : fixed
+
         try {
 
             if(token.equals("")){
@@ -66,10 +75,10 @@ public class UserEndpoints {
     }
 
 
-        /** @return Responses */
-        @GET
-        @Path("/{token}")
-        public Response getUsers (@PathParam("token") String token){
+    /** @return Responses */
+    @GET
+    @Path("/{token}")
+    public Response getUsers (@PathParam("token") String token){
 
         try{
         //Malthe: Get a list of users from the cache function
@@ -113,10 +122,10 @@ public class UserEndpoints {
         }
     }
 
-        @POST
-        @Path("/")
-        @Consumes(MediaType.APPLICATION_JSON)
-        public Response createUser (String body){
+    @POST
+    @Path("/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createUser (String body){
 
         try {
             // Read the json from body and transfer it to a user class
@@ -144,12 +153,12 @@ public class UserEndpoints {
 
     }
 
-        // TODO: Make a smart way of login in without having to enter ID, maybe not possible : fixed (implemented username)
-        // TODO: Make the system able to login users and assign them a token to use throughout the system : fixed
-        @POST
-        @Path("/login")
-        @Consumes(MediaType.APPLICATION_JSON)
-        public Response loginUser (String login){
+    // TODO: Make a smart way of login in without having to enter ID, maybe not possible : fixed (implemented username)
+    // TODO: Make the system able to login users and assign them a token to use throughout the system : fixed
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response loginUser (String login){
 
         User userLogin = new Gson().fromJson(login, User.class);
 
@@ -166,12 +175,11 @@ public class UserEndpoints {
         return Response.status(400).entity("Not valid login attempt. Please match your input").build();
     }
 
-        // TODO: Make the system able to delete users : fixed
-        @POST
-        @Path("/delete/{token}")
-        @Consumes(MediaType.APPLICATION_JSON)
-        public Response deleteUser (@PathParam("token") String token){
-
+    // TODO: Make the system able to delete users : fixed
+    @POST
+    @Path("/delete/{token}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUser (@PathParam("token") String token){
 
         ArrayList<User> users = userCache.getUsers(false);
 
@@ -194,12 +202,11 @@ public class UserEndpoints {
         return Response.status(400).entity("Your session ID is not valid").build();
     }
 
-        // TODO: Make the system able to update users : fixed
-        @POST
-        @Path("/update/{token}")
-        @Consumes(MediaType.APPLICATION_JSON)
-        public Response updateUser (String updatedUserData, @PathParam("token") String token){
-
+    // TODO: Make the system able to update users : fixed
+    @POST
+    @Path("/update/{token}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateUser (String updatedUserData, @PathParam("token") String token){
 
         ArrayList<User> users = userCache.getUsers(false);
 
@@ -226,10 +233,10 @@ public class UserEndpoints {
         return Response.status(400).entity("Your session ID is not valid").build();
     }
 
-        @POST
-        @Path("/updatepassword/{token}")
-        @Consumes(MediaType.APPLICATION_JSON)
-        public Response updatePassword (String passwordUpdate, @PathParam("token") String token){
+    @POST
+    @Path("/updatepassword/{token}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updatePassword (String passwordUpdate, @PathParam("token") String token){
 
         //Malthe: The inputtet password is saved in a user object and the password is saved in a string
         User passwordupdate = new Gson().fromJson(passwordUpdate, User.class);
@@ -267,9 +274,9 @@ public class UserEndpoints {
 
     }
 
-        @GET
-        @Path("/logout/{token}")
-        public Response logout (@PathParam("token") String token){
+    @GET
+    @Path("/logout/{token}")
+    public Response logout (@PathParam("token") String token){
 
         ArrayList<User> users = userCache.getUsers(false);
 

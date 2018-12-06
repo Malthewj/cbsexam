@@ -24,6 +24,14 @@ public class OrderEndpoints {
   private static OrderCache orderCache = new OrderCache();
   private static ArrayList<User> users = UserController.getUsers();
 
+  //Malthe: added standard response if user don't insert token i the URL
+  /** @return Responses */
+  @GET
+  @Path("")
+  public Response standardAnswer(){
+    return Response.status(400).entity("You need a session ID to view orders").build();
+  }
+
   /**
    * @param idOrder
    * @return Responses
