@@ -29,7 +29,8 @@ public class OrderEndpoints {
   @GET
   @Path("")
   public Response standardAnswer(){
-    return Response.status(400).entity("You need a session ID to view orders").build();
+    return Response.status(400).entity("You need a session ID to view orders \n" +
+            "You can access it at the following path: /user/login").build();
   }
 
   /**

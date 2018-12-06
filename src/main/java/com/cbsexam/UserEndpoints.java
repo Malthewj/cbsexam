@@ -27,7 +27,8 @@ public class UserEndpoints {
     @GET
     @Path("")
     public Response standardAnswer(){
-        return Response.status(400).entity("You need a session ID to view users").build();
+        return Response.status(400).entity("You need a session ID to view users \n" +
+                "You can access it at the following path: /user/login").build();
     }
 
 
