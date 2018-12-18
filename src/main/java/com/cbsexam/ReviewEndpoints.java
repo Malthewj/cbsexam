@@ -26,7 +26,7 @@ public class ReviewEndpoints {
 
     boolean check = true;
 
-    ArrayList<User> users = UserEndpoints.getUsersInCache();
+    ArrayList<User> users = UserController.getUsers();
 
     // Call our controller-layer in order to get the order from the DB
     ArrayList<Review> reviews = ReviewController.searchByTitle(reviewTitle);

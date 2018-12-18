@@ -20,8 +20,6 @@ public class UserEndpoints {
     public static Hashing hashing = new Hashing();
     private static ArrayList<User> usersInCache = userCache.getUsers(false);
 
-    public static ArrayList<User> getUsersInCache() { return usersInCache; }
-
     //Malthe: added standard response if user don't insert token i the URL
     /** @return Responses */
     @GET

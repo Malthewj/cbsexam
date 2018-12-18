@@ -1,6 +1,7 @@
 package com.cbsexam;
 
 import cache.OrderCache;
+import cache.UserCache;
 import com.google.gson.Gson;
 import controllers.OrderController;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import controllers.UserController;
 import model.Order;
 import model.User;
 import utils.Encryption;
@@ -20,6 +22,8 @@ import utils.Encryption;
 public class OrderEndpoints {
 
   private static OrderCache orderCache = new OrderCache();
+  private static ArrayList<User> users = new ArrayList<>();
+
 
   //Malthe: added standard response if user don't insert token i the URL
   /** @return Responses */
@@ -39,7 +43,7 @@ public class OrderEndpoints {
   public Response getOrder(@PathParam("idOrder") int idOrder, @PathParam("token") String token) {
 
     try{
-      ArrayList<User> users = UserEndpoints.getUsersInCache();
+      users = UserController.getUsers();
 
       // Call our controller-layer in order to get the order from the DB
       Order order = OrderController.getOrder(idOrder);
@@ -77,7 +81,7 @@ public class OrderEndpoints {
   public Response getOrders(@PathParam("token") String token) {
 
     boolean check = true;
-    ArrayList<User> users = UserEndpoints.getUsersInCache();
+    users = UserController.getUsers();
 
     // Call our cache-layer in order to get the order from the DB
     ArrayList<Order> orders = orderCache.getOrders(false);
@@ -107,26 +111,30 @@ public class OrderEndpoints {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response createOrder(String body) {
 
-    // Read the json from body and transfer it to a order class
-    Order newOrder = new Gson().fromJson(body, Order.class);
+    try {
+      // Read the json from body and transfer it to a order class
+      Order newOrder = new Gson().fromJson(body, Order.class);
 
-    // Use the controller to add the user
-    Order createdOrder = OrderController.createOrder(newOrder);
+      // Use the controller to add the user
+      Order createdOrder = OrderController.createOrder(newOrder);
 
-    //Malthe: Force an update since the list of orders will have added one order
-    orderCache.getOrders(true);
+      //Malthe: Force an update since the list of orders will have added one order
+      orderCache.getOrders(true);
 
-    // Get the user back with the added ID and return it to the user
-    String json = new Gson().toJson(createdOrder);
+      // Get the user back with the added ID and return it to the user
+      String json = new Gson().toJson(createdOrder);
 
-    // Return the data to the user
-    if (createdOrder != null) {
-      // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
-    } else {
+      // Return the data to the user
+      if (createdOrder != null) {
+        // Return a response with status 200 and JSON as type
+        return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+      } else {
 
-      // Return a response with status 400 and a message in text
-      return Response.status(400).entity("Could not create user").build();
+        // Return a response with status 400 and a message in text
+        return Response.status(400).entity("Could not create order").build();
+      }
+    }catch (Exception e){
+      return Response.status(400).entity("Failed to create order").build();
     }
   }
 }

@@ -22,6 +22,7 @@ import utils.Encryption;
 public class ProductEndpoints {
 
   private static ProductCache productCache = new ProductCache();
+  private static ArrayList<User> users = new ArrayList<>();
 
   //Malthe: added standard response if user don't insert token i the URL
   /** @return Responses */
@@ -41,7 +42,7 @@ public class ProductEndpoints {
   public Response getProduct(@PathParam("idProduct") int idProduct, @PathParam("token") String token) {
 
     try{
-        ArrayList<User> users = UserEndpoints.getUsersInCache();
+        users = UserController.getUsers();
         // Call our controller-layer in order to get the order from the DB
         Product product = ProductController.getProduct(idProduct);
 
@@ -80,7 +81,7 @@ public class ProductEndpoints {
   public Response getProducts(@PathParam("token") String token) {
 
     boolean check = true;
-    ArrayList<User> users = UserEndpoints.getUsersInCache();
+    users = UserController.getUsers();
 
     // Call our cache-layer in order to get the product from the DB
     //Malthe: forceUpdate set to false since we only want to update if new products added
