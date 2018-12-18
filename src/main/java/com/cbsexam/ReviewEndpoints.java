@@ -26,10 +26,10 @@ public class ReviewEndpoints {
 
     boolean check = true;
 
+    ArrayList<User> users = UserEndpoints.getUsersInCache();
+
     // Call our controller-layer in order to get the order from the DB
     ArrayList<Review> reviews = ReviewController.searchByTitle(reviewTitle);
-
-    ArrayList<User> users = UserController.getUsers();
 
     // We convert the java object to json with GSON library imported in Maven
     String json = new Gson().toJson(reviews);

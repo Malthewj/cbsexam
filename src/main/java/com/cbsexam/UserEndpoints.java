@@ -8,7 +8,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import model.User;
 import utils.Encryption;
 import utils.Hashing;
@@ -17,20 +16,20 @@ import utils.Log;
 @Path("user")
 public class UserEndpoints {
 
-
-
-    public static UserCache userCache = new UserCache();
+    private static UserCache userCache = new UserCache();
     public static Hashing hashing = new Hashing();
+    private static ArrayList<User> usersInCache = userCache.getUsers(false);
+
+    public static ArrayList<User> getUsersInCache() { return usersInCache; }
 
     //Malthe: added standard response if user don't insert token i the URL
     /** @return Responses */
     @GET
     @Path("")
     public Response standardAnswer(){
-        return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You need a session ID to view users \n" +
+        return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You need a session ID to view usersInCache \n" +
                 "You can access it at the following path: /user/login").build();
     }
-
 
     /**
      * @param token
@@ -50,9 +49,7 @@ public class UserEndpoints {
 
             String json;
 
-            ArrayList<User> users = userCache.getUsers(false);
-
-            for (User user : users) {
+            for (User user : usersInCache) {
                 if (user.getToken() != null && user.getToken().equals(token)) {
 
                     json = new Gson().toJson(user);
@@ -61,7 +58,7 @@ public class UserEndpoints {
                 }
             }
 
-            json = new Gson().toJson(users);
+            json = new Gson().toJson(usersInCache);
 
             // TODO: Add Encryption to JSON : fixed
             //Add encryption to json rawString object(ref. utils Encryption)
@@ -75,28 +72,26 @@ public class UserEndpoints {
 
     }
 
-
     /** @return Responses */
     @GET
     @Path("/{token}")
     public Response getUsers (@PathParam("token") String token){
 
         try{
-        //Malthe: Get a list of users from the cache function
-        ArrayList<User> users = userCache.getUsers(false);
+        //Malthe: Get a list of usersInCache from the cache function
         ArrayList<User> usersWithoutToken = new ArrayList<>();
 
         boolean check = true;
 
         //Malthe: Checks if the granted token is valid in DB
-        for (User user : users) {
+        for (User user : usersInCache) {
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 //Malthe: sets the check to false so the json String object is not encrypted if a valid token is granted
                 check = false;
 
                 // Write to log that we are here
-                Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
+                Log.writeLog(this.getClass().getName(), this, "Get all usersInCache", 0);
             }
             //Malthe: Create new User object without password and token
             User user1 = new User(0, user.getFirstname(), user.getLastname(), null, user.getEmail(), user.getCreatedTime(), user.getUsername(), null);
@@ -104,7 +99,7 @@ public class UserEndpoints {
             //Malthe: Add to the arraylist that shoukd be printed
             usersWithoutToken.add(user1);
         }
-        // Transfer users to json in order to return it to the user
+        // Transfer usersInCache to json in order to return it to the user
         String json = new Gson().toJson(usersWithoutToken);
 
         // TODO: Add Encryption to JSON : fixed
@@ -112,14 +107,14 @@ public class UserEndpoints {
         if (check) {
             json = Encryption.encryptDecryptXOR(json);
             // Write to log that we are here
-            Log.writeLog(this.getClass().getName(), this, "Get all users encrypted", 0);
+            Log.writeLog(this.getClass().getName(), this, "Get all usersInCache encrypted", 0);
         }
 
-        // Return the users with the status code 200
+        // Return the usersInCache with the status code 200
         return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
 
         }catch (Exception e){
-            return Response.status(400).entity("Couldn't find users").build();
+            return Response.status(400).entity("Couldn't find usersInCache").build();
         }
     }
 
@@ -135,8 +130,8 @@ public class UserEndpoints {
             // Use the controller to add the user
             User createUser = UserController.createUser(newUser);
 
-            //Malthe: Force update of the user cache, since there is a new user in the ArrayList of users
-            userCache.getUsers(true);
+            //Malthe: Force update of the user cache, since there is a new user in the ArrayList of usersInCache
+            usersInCache = userCache.getUsers(true);
 
             // Get the user back with the added ID and return it to the user
             String json = new Gson().toJson(createUser);
@@ -155,7 +150,7 @@ public class UserEndpoints {
     }
 
     // TODO: Make a smart way of login in without having to enter ID, maybe not possible : fixed (implemented username)
-    // TODO: Make the system able to login users and assign them a token to use throughout the system : fixed
+    // TODO: Make the system able to login usersInCache and assign them a token to use throughout the system : fixed
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -166,9 +161,10 @@ public class UserEndpoints {
         String token = UserController.auth(userLogin);
 
         //Malthe: Cache update since token will be updated
-        userCache.getUsers(true);
+        usersInCache = userCache.getUsers(true);
 
         if (token != null) {
+
             return Response.status(200).entity("Your token is:\n" + token).build();
         }
 
@@ -176,23 +172,21 @@ public class UserEndpoints {
         return Response.status(400).entity("Not valid login attempt. Please match your input").build();
     }
 
-    // TODO: Make the system able to delete users : fixed
+    // TODO: Make the system able to delete usersInCache : fixed
     @POST
     @Path("/delete/{token}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUser (@PathParam("token") String token){
 
-        ArrayList<User> users = userCache.getUsers(false);
-
-        //Malthe: Autherise the users token
-        for (User user : users) {
+        //Malthe: Autherise the usersInCache token
+        for (User user : usersInCache) {
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 //Malthe: Calls method in usercontroller that deletes found user
                 UserController.deleteUser(user.getId());
 
-                //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of users
-                userCache.getUsers(true);
+                //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of usersInCache
+                usersInCache = userCache.getUsers(true);
 
                 // Return a response with status 200 and JSON as type
                 return Response.status(200).entity("User with id " + user.getId() + " is now deleted").build();
@@ -203,23 +197,21 @@ public class UserEndpoints {
         return Response.status(400).entity("Your session ID is not valid").build();
     }
 
-    // TODO: Make the system able to update users : fixed
+    // TODO: Make the system able to update usersInCache : fixed
     @POST
     @Path("/update/{token}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUser (String updatedUserData, @PathParam("token") String token){
 
-        ArrayList<User> users = userCache.getUsers(false);
-
         User updatedUserDataObj = new Gson().fromJson(updatedUserData, User.class);
 
-        for (User user : users) {
+        for (User user : usersInCache) {
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 //Malthe: Calls method in usercontroller that updates with new info
                 UserController.updateUser(user, updatedUserDataObj);
 
-                //Malthe: Update of the user cache, since there is new information in the ArrayList of users
+                //Malthe: Update of the user cache, since there is new information in the ArrayList of usersInCache
                 userCache.getUsers(true);
 
                 // Return a response with status 200 and JSON as type
@@ -243,9 +235,7 @@ public class UserEndpoints {
         User passwordupdate = new Gson().fromJson(passwordUpdate, User.class);
         String password = passwordupdate.getPassword();
 
-        ArrayList<User> users = userCache.getUsers(false);
-
-        for (User user : users) {
+        for (User user : usersInCache) {
             if (user.getToken() != null && user.getToken().equals(token)) {
                 //Malthe: Getting the user which password needs to be updated to currentuser
                 User usertoUpdate = UserController.getUser(user.getId());
@@ -263,7 +253,7 @@ public class UserEndpoints {
                     //Malthe: Updating
                     UserController.updatePassword(user.getId(), newPassword);
 
-                    //Malthe: Forcing a update in the cache since the list of users has changed
+                    //Malthe: Forcing a update in the cache since the list of usersInCache has changed
                     userCache.getUsers(true);
 
                     return Response.status(200).entity("Password is updated and hashed").build();
@@ -279,9 +269,7 @@ public class UserEndpoints {
     @Path("/logout/{token}")
     public Response logout (@PathParam("token") String token){
 
-        ArrayList<User> users = userCache.getUsers(false);
-
-        for (User user : users) {
+        for (User user : usersInCache) {
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 UserController.logout(user);

@@ -12,8 +12,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import controllers.ProductController;
-import controllers.UserController;
 import model.Order;
 import model.User;
 import utils.Encryption;
@@ -22,7 +20,6 @@ import utils.Encryption;
 public class OrderEndpoints {
 
   private static OrderCache orderCache = new OrderCache();
-  private static ArrayList<User> users = UserController.getUsers();
 
   //Malthe: added standard response if user don't insert token i the URL
   /** @return Responses */
@@ -42,6 +39,7 @@ public class OrderEndpoints {
   public Response getOrder(@PathParam("idOrder") int idOrder, @PathParam("token") String token) {
 
     try{
+      ArrayList<User> users = UserEndpoints.getUsersInCache();
 
       // Call our controller-layer in order to get the order from the DB
       Order order = OrderController.getOrder(idOrder);
@@ -79,6 +77,7 @@ public class OrderEndpoints {
   public Response getOrders(@PathParam("token") String token) {
 
     boolean check = true;
+    ArrayList<User> users = UserEndpoints.getUsersInCache();
 
     // Call our cache-layer in order to get the order from the DB
     ArrayList<Order> orders = orderCache.getOrders(false);
