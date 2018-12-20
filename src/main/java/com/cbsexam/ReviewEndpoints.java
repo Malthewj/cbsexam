@@ -61,4 +61,37 @@ public class ReviewEndpoints {
     return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
   }
 
+  //TODO: Implement search by ID : fixed
+  /**
+   * @param id
+   * @return Responses
+   */
+  @GET
+  @Path("/id/{id}/{token}")
+  public Response search(@PathParam("id") int id, @PathParam("token") String token){
+
+    //Malthe: If this boolean is true the output will be encrypted
+    boolean check = true;
+
+    ArrayList<User> users = UserController.getUsers();
+
+    ArrayList<Review> reviews = ReviewController.searchByID(id);
+
+    String json = new Gson().toJson(reviews);
+
+    //Malthe: Checks if the granted token exists and the user is logged in
+    for(User user:users){
+      if(user.getToken() !=null && user.getToken().equals(token)){
+        check = false;
+      }
+    }
+
+    if(check){
+      json = Encryption.encryptDecryptXOR(json);
+    }
+
+    // Return a response with status 200 and JSON as type
+    return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
+  }
+
 }

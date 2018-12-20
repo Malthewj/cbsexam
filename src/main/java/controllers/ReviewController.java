@@ -40,14 +40,14 @@ public class ReviewController {
     ArrayList<Review> reviews = new ArrayList<Review>();
 
     // Do the search in the controller
-    SolrDocumentList documents = SolrController.search("title", Integer.toString(id));
+    SolrDocumentList documents = SolrController.search("id", Integer.toString(id));
 
     // Loop through the results, which are documents from SolR
     for (SolrDocument doc : documents) {
       // Create a new review based on the SolR document
       Review r =
           new Review(
-              (int) doc.get("id"),
+                  Integer.parseInt((String) doc.getFirstValue("id")),
               (String) doc.get("title"),
               (String) doc.get("description"),
               (String) doc.get("author"));
