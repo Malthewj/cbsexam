@@ -18,14 +18,14 @@ public class UserEndpoints {
 
     private static UserCache userCache = new UserCache();
     public static Hashing hashing = new Hashing();
-    private static ArrayList<User> usersInCache = userCache.getUsers(false);
+    private static ArrayList<User> usersInCache = new ArrayList<>();;
 
     //Malthe: added standard response if user don't insert token i the URL
     /** @return Responses */
     @GET
     @Path("")
     public Response standardAnswer(){
-        return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You need a session ID to view usersInCache \n" +
+        return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You need a session ID to view users \n" +
                 "You can access it at the following path: /user/login").build();
     }
 
@@ -45,6 +45,8 @@ public class UserEndpoints {
             }
 
             String json;
+
+            usersInCache = userCache.getUsers(true);
 
             for (User user : usersInCache) {
                 if (user.getToken() != null && user.getToken().equals(token)) {
@@ -80,6 +82,8 @@ public class UserEndpoints {
 
         //Malthe: If this boolean is true the output will be encrypted
         boolean check = true;
+
+        usersInCache = userCache.getUsers(true);
 
         //Malthe: Checks if the granted token is valid in DB
         for (User user : usersInCache) {

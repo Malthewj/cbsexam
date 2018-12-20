@@ -21,10 +21,10 @@ public class ReviewEndpoints {
   @GET
   @Path("title/{title}")
   public Response standardAnswer(@PathParam("title") String reviewTitle){
-    return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You need a session ID to view products \n" +
+    return Response.status(400).type(MediaType.APPLICATION_JSON_TYPE).entity("You need a session ID to view book titles \n" +
             "You can access it at the following path: /user/login").build();
   }
-  
+
   /**
    * @param reviewTitle
    * @return Responses
