@@ -161,9 +161,6 @@ public class UserEndpoints {
 
         String token = UserController.auth(userLogin);
 
-        //Malthe: Cache update since token will be updated in DB
-        usersInCache = userCache.getUsers(true);
-
         if (token != null) {
             return Response.status(200).entity("Your token is:\n" + token).build();
         }
@@ -177,15 +174,14 @@ public class UserEndpoints {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUser (@PathParam("token") String token){
 
+        usersInCache = userCache.getUsers(true);
+
         //Malthe: Autherise the user token
         for (User user : usersInCache) {
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 //Malthe: Calls method in usercontroller that deletes found user
                 UserController.deleteUser(user.getId());
-
-                //Malthe: Update of the user cache, since there is deleted a User in the ArrayList of usersInCache
-                usersInCache = userCache.getUsers(true);
 
                 // Return a response with status 200 and JSON as type
                 return Response.status(200).entity("User with id " + user.getId() + " is now deleted").build();
@@ -202,15 +198,14 @@ public class UserEndpoints {
 
         User updatedUserDataObj = new Gson().fromJson(updatedUserData, User.class);
 
+        usersInCache = userCache.getUsers(true);
+
         for (User user : usersInCache) {
             //Malthe: Checks if inputted token is valid
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 //Malthe: Calls method in usercontroller that updates with new info
                 UserController.updateUser(user, updatedUserDataObj);
-
-                //Malthe: Update of the user cache, since there is new information in the ArrayList of usersInCache
-                userCache.getUsers(true);
 
                 // Return a response with status 200 and JSON as type
                 return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(
@@ -233,6 +228,8 @@ public class UserEndpoints {
         User passwordupdate = new Gson().fromJson(passwordUpdate, User.class);
         String password = passwordupdate.getPassword();
 
+        usersInCache = userCache.getUsers(true);
+
         for (User user : usersInCache) {
             //Malthe: Checks if inputted token is valid
             if (user.getToken() != null && user.getToken().equals(token)) {
@@ -252,9 +249,6 @@ public class UserEndpoints {
                     //Malthe: Updating
                     UserController.updatePassword(user.getId(), newPassword);
 
-                    //Malthe: Forcing a update in the cache since the list of usersInCache has changed
-                    userCache.getUsers(true);
-
                     return Response.status(200).entity("Password is updated and hashed").build();
                 }
             }
@@ -267,14 +261,13 @@ public class UserEndpoints {
     @Path("/logout/{token}")
     public Response logout (@PathParam("token") String token){
 
+        usersInCache = userCache.getUsers(true);
+
         for (User user : usersInCache) {
             //Malthe: Checks if inputted token is valid
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 UserController.logout(user);
-
-                //Malthe: Cache update since token will be updated
-                userCache.getUsers(true);
 
                 return Response.status(200).entity("You are now logged out").build();
 
