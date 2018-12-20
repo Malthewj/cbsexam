@@ -12,14 +12,14 @@ public class StartEndpoints {
     @Path("")
     public Response getStartPage(){
 
-        return Response.status(200).type(MediaType.TEXT_HTML).entity(
-                "<p>WELCOME</p><br>" +
-                "<p>This is a backend system containing endpoints</p><br>" +
-                "<p>You can use the following endpoints:</p><br>" +
-                "<a href=user/'insertToken'>User</a> <br>" +
-                "<a href=product/'insertToken'>Products</a> <br>" +
-                "<a href=order/'insertToken'>Order</a> <br>" +
-                "<a href=search/title/*/'insertToken'>Search</a>").build();
+        return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(
+                "\tWELCOME\n" +
+                "\tThis is a backend system containing endpoints\n" +
+                "\tYou can use the following endpoints:\n" +
+                "\t/user/'insertToken'\n" +
+                "\t/product/'insertToken'\n" +
+                "\t/order/'insertToken'\n" +
+                "\t/search/title/*/'insertToken'\n").build();
 
     }
 
