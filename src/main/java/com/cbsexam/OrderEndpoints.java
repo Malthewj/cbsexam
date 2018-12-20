@@ -43,11 +43,12 @@ public class OrderEndpoints {
   public Response getOrder(@PathParam("idOrder") int idOrder, @PathParam("token") String token) {
 
     try{
-      users = UserController.getUsers();
+        users = UserController.getUsers();
 
-      // Call our controller-layer in order to get the order from the DB
-      Order order = OrderController.getOrder(idOrder);
+        //Call our controller-layer in order to get the order from the DB
+        Order order = OrderController.getOrder(idOrder);
 
+        //Malthe: If this boolean is true the output will be encrypted
         boolean check = true;
 
         // We convert the java object to json with GSON library imported in Maven
@@ -80,7 +81,9 @@ public class OrderEndpoints {
   @Path("/{token}")
   public Response getOrders(@PathParam("token") String token) {
 
+    //Malthe: If this boolean is true the output will be encrypted
     boolean check = true;
+
     users = UserController.getUsers();
 
     // Call our cache-layer in order to get the order from the DB

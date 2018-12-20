@@ -38,7 +38,6 @@ public class UserEndpoints {
     public Response getUser (@PathParam("token") String token){
 
         // TODO: What should happen if something breaks down? : fixed
-
         try {
 
             if(token.equals("")){
@@ -56,6 +55,7 @@ public class UserEndpoints {
                 }
             }
 
+            //Malthe: The whole list of users are used and is encrypted
             json = new Gson().toJson(usersInCache);
 
             // TODO: Add Encryption to JSON : fixed
@@ -67,7 +67,6 @@ public class UserEndpoints {
             System.out.println(e.getMessage());
             return Response.status(400).entity("Something went wrong").build();
         }
-
     }
 
     /** @return Responses */
@@ -79,6 +78,7 @@ public class UserEndpoints {
         //Malthe: Get a list of usersInCache from the cache function
         ArrayList<User> usersWithoutToken = new ArrayList<>();
 
+        //Malthe: If this boolean is true the output will be encrypted
         boolean check = true;
 
         //Malthe: Checks if the granted token is valid in DB
@@ -144,7 +144,6 @@ public class UserEndpoints {
         } catch (Exception e) {
             return Response.status(400).entity("Username already taken").build();
         }
-
     }
 
     // TODO: Make a smart way of login in without having to enter ID, maybe not possible : fixed (implemented username)
@@ -158,15 +157,13 @@ public class UserEndpoints {
 
         String token = UserController.auth(userLogin);
 
-        //Malthe: Cache update since token will be updated
+        //Malthe: Cache update since token will be updated in DB
         usersInCache = userCache.getUsers(true);
 
         if (token != null) {
-
             return Response.status(200).entity("Your token is:\n" + token).build();
         }
-
-        // Return a response with status 200 and JSON as type
+        // Return a response with status 400 - failed login
         return Response.status(400).entity("Not valid login attempt. Please match your input").build();
     }
 
@@ -176,7 +173,7 @@ public class UserEndpoints {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUser (@PathParam("token") String token){
 
-        //Malthe: Autherise the usersInCache token
+        //Malthe: Autherise the user token
         for (User user : usersInCache) {
             if (user.getToken() != null && user.getToken().equals(token)) {
 
@@ -189,9 +186,7 @@ public class UserEndpoints {
                 // Return a response with status 200 and JSON as type
                 return Response.status(200).entity("User with id " + user.getId() + " is now deleted").build();
             }
-
         }
-
         return Response.status(400).entity("Your session ID is not valid").build();
     }
 
@@ -204,6 +199,7 @@ public class UserEndpoints {
         User updatedUserDataObj = new Gson().fromJson(updatedUserData, User.class);
 
         for (User user : usersInCache) {
+            //Malthe: Checks if inputted token is valid
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 //Malthe: Calls method in usercontroller that updates with new info
@@ -234,6 +230,7 @@ public class UserEndpoints {
         String password = passwordupdate.getPassword();
 
         for (User user : usersInCache) {
+            //Malthe: Checks if inputted token is valid
             if (user.getToken() != null && user.getToken().equals(token)) {
                 //Malthe: Getting the user which password needs to be updated to currentuser
                 User usertoUpdate = UserController.getUser(user.getId());
@@ -260,7 +257,6 @@ public class UserEndpoints {
         }
 
         return Response.status(400).entity("Session ID not valid").build();
-
     }
 
     @GET
@@ -268,6 +264,7 @@ public class UserEndpoints {
     public Response logout (@PathParam("token") String token){
 
         for (User user : usersInCache) {
+            //Malthe: Checks if inputted token is valid
             if (user.getToken() != null && user.getToken().equals(token)) {
 
                 UserController.logout(user);
@@ -279,9 +276,7 @@ public class UserEndpoints {
 
             }
         }
-
         // Return a response with status 200 and JSON as type
         return Response.status(400).entity("Session ID not valid").build();
     }
-
 }

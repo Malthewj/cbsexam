@@ -46,6 +46,7 @@ public class ProductEndpoints {
         // Call our controller-layer in order to get the order from the DB
         Product product = ProductController.getProduct(idProduct);
 
+        //Malthe: If this boolean is true the output will be encrypted
         boolean check = true;
 
         // We convert the java object to json with GSON library imported in Maven
@@ -80,7 +81,9 @@ public class ProductEndpoints {
   @Path("/{token}")
   public Response getProducts(@PathParam("token") String token) {
 
+    //Malthe: If this boolean is true the output will be encrypted
     boolean check = true;
+
     users = UserController.getUsers();
 
     // Call our cache-layer in order to get the product from the DB
@@ -112,6 +115,7 @@ public class ProductEndpoints {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response createProduct(String body) {
 
+    try{
     // Read the json from body and transfer it to a product class
     Product newProduct = new Gson().fromJson(body, Product.class);
 
@@ -130,6 +134,9 @@ public class ProductEndpoints {
       return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
     } else {
       return Response.status(400).entity("Could not create product").build();
+    }
+    }catch (Exception e){
+      return Response.status(400).entity("Failed to create product").build();
     }
   }
 }

@@ -24,6 +24,7 @@ public class ReviewEndpoints {
   @Path("/title/{title}/{token}")
   public Response search(@PathParam("title") String reviewTitle, @PathParam("token") String token) {
 
+    //Malthe: If this boolean is true the output will be encrypted
     boolean check = true;
 
     ArrayList<User> users = UserController.getUsers();
@@ -50,6 +51,5 @@ public class ReviewEndpoints {
     // Return a response with status 200 and JSON as type
     return Response.status(200).type(MediaType.APPLICATION_JSON).entity(json).build();
   }
-
 
 }
