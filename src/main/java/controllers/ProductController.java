@@ -27,22 +27,27 @@ public class ProductController {
     // Build the SQL query for the DB
     String sql = "SELECT * FROM product where id=" + id;
 
+    return getProductCollect(sql);
+  }
+
+  private static Product getProductCollect(String sql) {
     // Run the query in the DB and make an empty object to return
     ResultSet rs = dbCon.query(sql);
+
     Product product = null;
 
     try {
       // Get first row and create the object and return it
       if (rs.next()) {
         product =
-            new Product(
-                rs.getInt("id"),
-                rs.getString("product_name"),
-                rs.getString("sku"),
-                rs.getFloat("price"),
-                rs.getString("description"),
-                rs.getInt("stock"),
-                    rs.getLong("created_at"));
+                new Product(
+                        rs.getInt("id"),
+                        rs.getString("product_name"),
+                        rs.getString("sku"),
+                        rs.getFloat("price"),
+                        rs.getString("description"),
+                        rs.getInt("stock"),
+                        rs.getLong("created_at"));
 
         // Return the product
         return product;
@@ -65,30 +70,7 @@ public class ProductController {
 
     String sql = "SELECT * FROM product where sku='" + sku + "'";
 
-    ResultSet rs = dbCon.query(sql);
-    Product product = null;
-
-    try {
-      if (rs.next()) {
-        product =
-            new Product(
-                rs.getInt("id"),
-                rs.getString("product_name"),
-                rs.getString("sku"),
-                rs.getFloat("price"),
-                rs.getString("description"),
-                rs.getInt("stock"),
-                    rs.getLong("created_at"));
-
-        return product;
-      } else {
-        System.out.println("No user found");
-      }
-    } catch (SQLException ex) {
-      System.out.println(ex.getMessage());
-    }
-
-    return product;
+    return getProductCollect(sql);
   }
 
   /**

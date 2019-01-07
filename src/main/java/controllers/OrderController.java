@@ -34,8 +34,42 @@ public class OrderController {
             "Join address as billing on orders.billing_address_id=billing.id\n" +
             "join address as shipping on orders.shipping_address_id=shipping.id where orders.id =" + id;
 
+    return getOrdersCollect(sql);
+  }
+
+  /**
+   * Get all orders in database
+   *
+   * @return
+   */
+  public static ArrayList<Order> getOrders() {
+
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    //Malthe: got rid of nested queries
+    String sql2 = "SELECT *,\n" +
+            "billing.street_address as billing, shipping.street_address as shipping\n" +
+            "from orders\n" +
+            "join user on orders.user_id = user.id\n" +
+            "Join address as billing on orders.billing_address_id=billing.id\n" +
+            "join address as shipping on orders.shipping_address_id=shipping.id";
+
+    ArrayList<Order> orders = new ArrayList<Order>();
+
+    Order order = getOrdersCollect(sql2);
+
+    orders.add(order);
+
+    // return the orders
+    return orders;
+  }
+
+  private static Order getOrdersCollect(String sql) {
     // Do the query in the database and create an empty object for the results
     ResultSet rs = dbCon.query(sql);
+
     Order order = null;
 
     try {
@@ -72,15 +106,15 @@ public class OrderController {
 
         // Create an object instance of order from the database dataa
         order =
-            new Order(
-                rs.getInt("id"),
-                user1,
-                lineItems,
-                billing,
-                shipping,
-                rs.getFloat("order_total"),
-                rs.getLong("created_at"),
-                rs.getLong("updated_at"));
+                new Order(
+                        rs.getInt("id"),
+                        user1,
+                        lineItems,
+                        billing,
+                        shipping,
+                        rs.getFloat("order_total"),
+                        rs.getLong("created_at"),
+                        rs.getLong("updated_at"));
 
         // Returns the build order
         return order;
@@ -90,87 +124,8 @@ public class OrderController {
     } catch (SQLException ex) {
       System.out.println(ex.getMessage());
     }
-
     // Returns null
     return order;
-  }
-
-  /**
-   * Get all orders in database
-   *
-   * @return
-   */
-  public static ArrayList<Order> getOrders() {
-
-    if (dbCon == null) {
-      dbCon = new DatabaseController();
-    }
-
-    //Malthe: got rid of nested queries
-    String sql2 = "SELECT *,\n" +
-            "billing.street_address as billing, shipping.street_address as shipping\n" +
-            "from orders\n" +
-            "join user on orders.user_id = user.id\n" +
-            "Join address as billing on orders.billing_address_id=billing.id\n" +
-            "join address as shipping on orders.shipping_address_id=shipping.id";
-
-    ResultSet rs = dbCon.query(sql2);
-    ArrayList<Order> orders = new ArrayList<Order>();
-
-    try {
-      while(rs.next()) {
-
-        //TODO: Perhaps we could optimize things a bit here and get rid of nested queries : fixed
-        ArrayList<LineItem> lineItems = LineItemController.getLineItemsForOrder(rs.getInt("id"));
-
-        User user1 = new User(
-                rs.getInt("user_id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getString("password"),
-                rs.getString("email"),
-                rs.getLong("created_at"),
-                rs.getString("username"),
-                rs.getString("token"));
-          user1.setToken(null);
-          user1.setPassword(null);
-
-        Address billing = new Address(
-                rs.getInt("billing_address_id"),
-                rs.getString("name"),
-                rs.getString("billing"),
-                rs.getString("city"),
-                rs.getString("zipcode"));
-
-        Address shipping = new Address(
-                rs.getInt("shipping_address_id"),
-                rs.getString("name"),
-                rs.getString("shipping"),
-                rs.getString("city"),
-                rs.getString("zipcode"));
-
-        // Create an order from the database data
-        Order order =
-            new Order(
-                rs.getInt("id"),
-                user1,
-                lineItems,
-                billing,
-                shipping,
-                rs.getFloat("order_total"),
-                rs.getLong("created_at"),
-                rs.getLong("updated_at"));
-
-        // Add order to our list
-        orders.add(order);
-
-      }
-    } catch (SQLException ex) {
-      System.out.println(ex.getMessage());
-    }
-
-    // return the orders
-    return orders;
   }
 
   public static Order createOrder(Order order) {
@@ -262,5 +217,7 @@ public class OrderController {
     // Return order
     return order;
     }
+
+
 
 }

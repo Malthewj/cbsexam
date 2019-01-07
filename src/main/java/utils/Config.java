@@ -20,12 +20,6 @@ public final class Config {
   private static String SOLR_PATH;
   private static String SOLR_CORE;
   private static long CACHE_TTL;
-  private static char key1;
-  private static char key2;
-  private static char key3;
-  private static char key4;
-  private static char key5;
-  private static char key6;
   private static char[] keyArray;
 
   public static long getCacheTtl() {
@@ -109,12 +103,12 @@ public final class Config {
     SOLR_CORE = json.get("SOLR_CORE").toString().replace("\"", "");
     CACHE_TTL = json.get("CACHE_TTL").getAsLong();
 
-    key1 = json.get("Key1").getAsCharacter();
-    key2 = json.get("Key2").getAsCharacter();
-    key3 = json.get("Key3").getAsCharacter();
-    key4 = json.get("Key4").getAsCharacter();
-    key5 = json.get("Key5").getAsCharacter();
-    key6 = json.get("Key6").getAsCharacter();
+    char key1 = json.get("Key1").getAsCharacter();
+    char key2 = json.get("Key2").getAsCharacter();
+    char key3 = json.get("Key3").getAsCharacter();
+    char key4 = json.get("Key4").getAsCharacter();
+    char key5 = json.get("Key5").getAsCharacter();
+    char key6 = json.get("Key6").getAsCharacter();
 
     keyArray = new char[]{key1, key2, key3, key4, key5, key6};
 

@@ -4,8 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import cache.UserCache;
-import com.cbsexam.UserEndpoints;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -14,7 +12,6 @@ import javax.ws.rs.core.Response;
 
 public class UserController {
 
-    private static UserCache userCache = new UserCache();
   private static DatabaseController dbCon;
   private static Hashing hashing = new Hashing();
 
